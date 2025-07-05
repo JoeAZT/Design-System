@@ -121,13 +121,16 @@ public struct DesignRow<Content: View>: View {
     }
 
     public var body: some View {
-        let row = HStack {
+        let row = VStack(alignment: .leading, spacing: 8) {
             if let title = title {
                 Text(title)
                     .font(.headline)
             }
-            content
-            Spacer()
+            HStack {
+                content
+                Spacer()
+                
+            }
         }
         .foregroundColor(foregroundColor)
         .padding()
@@ -173,7 +176,10 @@ public struct BaseView<Content: View>: View {
             DesignRow(title: "Row Title", action: { print("Tapped!") }) {
                 Image(systemName: "star")
             }
-            DesignRow(title: "Row Title", action: { print("Tapped!") }) {
+            DesignRow(
+                title: "Row Title",
+                action: { print("Tapped!") }
+            ) {
                 Image(systemName: "star")
             }
             DesignButton(
