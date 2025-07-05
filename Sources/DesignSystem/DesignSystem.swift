@@ -1,5 +1,27 @@
 import SwiftUI
 
+// MARK: - User-Defined Colors Protocol
+public protocol DesignSystemColorProvider: Sendable {
+    var primaryForeground: Color { get }
+    var primaryBackground: Color { get }
+    var secondaryForeground: Color { get }
+    var secondaryBackground: Color { get }
+    var accentForeground: Color { get }
+    var accentBackground: Color { get }
+}
+
+// MARK: - Default Color Provider
+public struct DefaultDesignSystemColors: DesignSystemColorProvider {
+    public let primaryForeground: Color = .white
+    public let primaryBackground: Color = .gray
+    public let secondaryForeground: Color = .white
+    public let secondaryBackground: Color = .gray
+    public let accentForeground: Color = .white
+    public let accentBackground: Color = .green
+    
+    public init() {}
+}
+
 public enum DesignScheme {
     case primary, secondary, accent
 }
@@ -17,15 +39,32 @@ public struct DesignSchemeColors: Sendable {
     public let primary: DesignSchemeColorPair
     public let secondary: DesignSchemeColorPair
     public let accent: DesignSchemeColorPair
+    
     public init(
-        primary: DesignSchemeColorPair = .init(foreground: .white, background: .blue),
-        secondary: DesignSchemeColorPair = .init(foreground: .black, background: .gray),
-        accent: DesignSchemeColorPair = .init(foreground: .white, background: .orange)
+        primary: DesignSchemeColorPair = .init(foreground: .white, background: .gray),
+        secondary: DesignSchemeColorPair = .init(foreground: .white, background: .gray),
+        accent: DesignSchemeColorPair = .init(foreground: .white, background: .green)
     ) {
         self.primary = primary
         self.secondary = secondary
         self.accent = accent
     }
+    
+    public init(from provider: DesignSystemColorProvider) {
+        self.primary = DesignSchemeColorPair(
+            foreground: provider.primaryForeground,
+            background: provider.primaryBackground
+        )
+        self.secondary = DesignSchemeColorPair(
+            foreground: provider.secondaryForeground,
+            background: provider.secondaryBackground
+        )
+        self.accent = DesignSchemeColorPair(
+            foreground: provider.accentForeground,
+            background: provider.accentBackground
+        )
+    }
+    
     public func colors(for scheme: DesignScheme) -> DesignSchemeColorPair {
         switch scheme {
         case .primary: return primary
@@ -35,8 +74,13 @@ public struct DesignSchemeColors: Sendable {
     }
 }
 
+// MARK: - Environment Keys
 private struct DesignSchemeKey: EnvironmentKey {
     static let defaultValue = DesignSchemeColors()
+}
+
+private struct ColorProviderKey: EnvironmentKey {
+    static let defaultValue: DesignSystemColorProvider = DefaultDesignSystemColors()
 }
 
 public extension EnvironmentValues {
@@ -44,11 +88,25 @@ public extension EnvironmentValues {
         get { self[DesignSchemeKey.self] }
         set { self[DesignSchemeKey.self] = newValue }
     }
+    
+    var designSystemColorProvider: DesignSystemColorProvider {
+        get { self[ColorProviderKey.self] }
+        set { 
+            self[ColorProviderKey.self] = newValue
+            // Automatically update the design scheme colors when provider changes
+            self[DesignSchemeKey.self] = DesignSchemeColors(from: newValue)
+        }
+    }
 }
 
+// MARK: - View Extensions
 public extension View {
     func designSchemeColors(_ colors: DesignSchemeColors) -> some View {
         environment(\.designSchemeColors, colors)
+    }
+    
+    func designSystemColorProvider(_ provider: DesignSystemColorProvider) -> some View {
+        environment(\.designSystemColorProvider, provider)
     }
 }
 
@@ -171,39 +229,63 @@ public struct BaseView<Content: View>: View {
 }
 
 #Preview {
-    BaseView {
+    // Example of how users can define their own colors
+    struct MyCustomColors: DesignSystemColorProvider {
+        let primaryForeground: Color = .white
+        let primaryBackground: Color = .blue
+        let secondaryForeground: Color = .black
+        let secondaryBackground: Color = .purple
+        let accentForeground: Color = .white
+        let accentBackground: Color = .orange
+    }
+    
+    return BaseView {
         VStack(spacing: 8) {
-            DesignRow(title: "Row Title", action: { print("Tapped!") }) {
+            // Using default colors
+            Text("Default Colors:")
+                .font(.headline)
+                .padding(.bottom, 4)
+            
+            DesignRow(title: "Default Row", action: { print("Tapped!") }) {
                 Image(systemName: "star")
             }
-            DesignRow(
-                title: "Row Title",
-                action: { print("Tapped!") }
-            ) {
-                Image(systemName: "star")
-            }
+            
             DesignButton(
-                title: "Primary Button",
+                title: "Default Primary Button",
                 action: { print("Primary tapped") }
             )
+            
             DesignButton(
-                title: "Secondary Button",
-                action: { print("Secondary tapped") }
-            )
-            DesignButton(
-                title: "Accent Button",
+                title: "Default Accent Button",
                 action: { print("Accent tapped") }
             )
+            .designScheme(.accent)
+            
+            Divider()
+                .padding(.vertical)
+            
+            // Using custom colors
+            Text("Custom Colors:")
+                .font(.headline)
+                .padding(.bottom, 4)
+            
+            DesignRow(title: "Custom Row", action: { print("Tapped!") }) {
+                Image(systemName: "star")
+            }
+            .designSystemColorProvider(MyCustomColors())
+            
             DesignButton(
-                title: "Scheme Primary",
-                action: { print("Scheme Primary tapped") }
+                title: "Custom Primary Button",
+                action: { print("Primary tapped") }
             )
-            .designScheme(.primary)
+            .designSystemColorProvider(MyCustomColors())
+            
             DesignButton(
-                title: "Scheme Accent",
-                action: { print("Scheme Accent tapped") }
+                title: "Custom Accent Button",
+                action: { print("Accent tapped") }
             )
             .designScheme(.accent)
+            .designSystemColorProvider(MyCustomColors())
         }
     }
 }
