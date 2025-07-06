@@ -126,12 +126,12 @@ public extension DesignSystemColorProvider {
 public struct DesignButton: View {
     let title: String
     let action: (() -> Void)?
-    let scheme: DesignScheme?
+    let scheme: DesignScheme
     @Environment(\.designSchemeColors) private var schemeColors
     
     public init(
         title: String,
-        scheme: DesignScheme? = nil,
+        scheme: DesignScheme = .primary,
         action: (() -> Void)? = nil
     ) {
         self.title = title
@@ -140,11 +140,7 @@ public struct DesignButton: View {
     }
 
     private var colorPair: DesignSchemeColorPair {
-        if let scheme = scheme {
-            return schemeColors.colors(for: scheme)
-        } else {
-            return schemeColors.colors(for: .primary)
-        }
+        schemeColors.colors(for: scheme)
     }
 
     public var body: some View {
@@ -164,30 +160,16 @@ public struct DesignButton: View {
     }
 }
 
-public extension DesignButton {
-    func designScheme(_ scheme: DesignScheme) -> DesignButton {
-        DesignButton(title: self.title, scheme: scheme, action: self.action)
-    }
-}
-
-public extension DesignRow {
-    func designScheme(_ scheme: DesignScheme) -> DesignRow<Content> {
-        DesignRow(title: self.title, scheme: scheme, action: self.action) {
-            self.content
-        }
-    }
-}
-
 public struct DesignRow<Content: View>: View {
     let title: String?
-    let scheme: DesignScheme?
+    let scheme: DesignScheme
     let action: (() -> Void)?
     let content: Content
     @Environment(\.designSchemeColors) private var schemeColors
 
     public init(
         title: String? = nil,
-        scheme: DesignScheme? = nil,
+        scheme: DesignScheme = .primary,
         action: (() -> Void)? = nil,
         @ViewBuilder content: () -> Content
     ) {
@@ -198,11 +180,7 @@ public struct DesignRow<Content: View>: View {
     }
 
     private var colorPair: DesignSchemeColorPair {
-        if let scheme = scheme {
-            return schemeColors.colors(for: scheme)
-        } else {
-            return schemeColors.colors(for: .primary)
-        }
+        schemeColors.colors(for: scheme)
     }
 
     public var body: some View {
@@ -214,7 +192,6 @@ public struct DesignRow<Content: View>: View {
             HStack {
                 content
                 Spacer()
-                
             }
         }
         .foregroundColor(colorPair.foreground)
@@ -267,7 +244,6 @@ public struct BaseView<Content: View>: View {
 }
 
 #Preview {
-    // Example of how users can define their own colors
     struct MyCustomColors: DesignSystemColorProvider {
         let primaryForeground: Color = .white
         let primaryBackground: Color = .black.opacity(0.8)
@@ -291,15 +267,13 @@ public struct BaseView<Content: View>: View {
                     Image(systemName: "star")
                 }
                 
-                DesignRow(title: "Custom Secondary Row", action: { print("Tapped!") }) {
+                DesignRow(title: "Custom Secondary Row", scheme: .secondary, action: { print("Tapped!") }) {
                     Image(systemName: "heart")
                 }
-                .designScheme(.secondary)
                 
-                DesignRow(title: "Custom Accent Row", action: { print("Tapped!") }) {
+                DesignRow(title: "Custom Accent Row", scheme: .accent, action: { print("Tapped!") }) {
                     Image(systemName: "bolt")
                 }
-                .designScheme(.accent)
                 
                 DesignButton(
                     title: "Custom Primary Button",
@@ -308,15 +282,15 @@ public struct BaseView<Content: View>: View {
                 
                 DesignButton(
                     title: "Custom Secondary Button",
+                    scheme: .secondary,
                     action: { print("Secondary tapped") }
                 )
-                .designScheme(.secondary)
                 
                 DesignButton(
                     title: "Custom Accent Button",
+                    scheme: .accent,
                     action: { print("Accent tapped") }
                 )
-                .designScheme(.accent)
             }
             .designSystemColorProvider(MyCustomColors())
         }
