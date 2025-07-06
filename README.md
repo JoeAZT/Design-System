@@ -6,8 +6,9 @@ A SwiftUI design system package that provides customizable UI components with su
 
 - **DesignButton**: Customizable buttons with different color schemes
 - **DesignRow**: Flexible row components with customizable styling
+- **DesignTextField**: Text input fields with customizable styling
 - **BaseView**: Foundation view with background and padding
-- **Custom Color Support**: Define your own color schemes in your project
+- **App-Wide Color Support**: Define your colors once and use them throughout your entire app
 
 ## Installation
 
@@ -17,33 +18,11 @@ Add this package to your Xcode project:
 2. Enter the package URL
 3. Select the version you want to use
 
-## Basic Usage
+## Quick Start
 
-```swift
-import SwiftUI
-import DesignSystem
+### 1. Define Your Colors
 
-struct ContentView: View {
-    var body: some View {
-        BaseView {
-            VStack(spacing: 16) {
-                DesignButton(
-                    title: "Primary Button",
-                    action: { print("Button tapped!") }
-                )
-                
-                DesignRow(title: "My Row") {
-                    Image(systemName: "star.fill")
-                }
-            }
-        }
-    }
-}
-```
-
-## Custom Colors
-
-You can define your own color scheme by implementing the `DesignSystemColorProvider` protocol:
+Create a struct that implements `DesignSystemColorProvider`:
 
 ```swift
 struct MyCustomColors: DesignSystemColorProvider {
@@ -56,23 +35,34 @@ struct MyCustomColors: DesignSystemColorProvider {
 }
 ```
 
-Then apply your custom colors to your views by setting the color provider once at the top level:
+### 2. Set Colors App-Wide (Recommended)
+
+Set your custom colors once at the app level, and all DesignSystem components will automatically use them:
+
+```swift
+@main
+struct MyApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .designSystemColorProvider(MyCustomColors())
+        }
+    }
+}
+```
+
+### 3. Use Components
+
+Now you can use DesignSystem components anywhere in your app without specifying colors:
 
 ```swift
 struct ContentView: View {
     var body: some View {
         BaseView {
             VStack(spacing: 16) {
-                // All components below will automatically use your custom colors
                 DesignButton(
                     title: "Primary Button",
                     action: { print("Button tapped!") }
-                )
-                
-                DesignButton(
-                    title: "Secondary Button",
-                    scheme: .secondary,
-                    action: { print("Secondary tapped!") }
                 )
                 
                 DesignButton(
@@ -81,15 +71,20 @@ struct ContentView: View {
                     action: { print("Accent tapped!") }
                 )
                 
-                DesignRow(title: "Primary Row") {
+                DesignRow(title: "My Row") {
                     Image(systemName: "star.fill")
                 }
                 
-                DesignRow(title: "Accent Row", scheme: .accent) {
-                    Image(systemName: "bolt.fill")
+                DesignRow(title: "Secondary Row", scheme: .secondary) {
+                    Image(systemName: "heart.fill")
                 }
+                
+                DesignTextField(
+                    placeholder: "Enter your name",
+                    text: $name,
+                    scheme: .primary
+                )
             }
-            .designSystemColorProvider(MyCustomColors())
         }
     }
 }
@@ -99,18 +94,37 @@ struct ContentView: View {
 
 The DesignSystem supports three color schemes:
 
-- **Primary**: Default button and row styling
+- **Primary** (default): Main button and row styling
 - **Secondary**: Alternative styling option
 - **Accent**: Highlighted styling for important actions
 
-You can specify a scheme for individual components:
+## Advanced Usage
+
+### Setting Colors for Specific Views
+
+If you want different colors for specific parts of your app, you can override the app-wide colors:
 
 ```swift
-DesignButton(
-    title: "Accent Button",
-    scheme: .accent,
-    action: { print("Accent button tapped!") }
-)
+struct SpecialView: View {
+    var body: some View {
+        VStack {
+            DesignButton(title: "Special Button") { }
+        }
+        .designSystemColorProvider(DifferentColors())
+    }
+}
+```
+
+### Custom Background Gradients
+
+You can create background gradients from your color scheme:
+
+```swift
+BaseView(
+    background: MyCustomColors().createBackgroundGradient()
+) {
+    // Your content here
+}
 ```
 
 ## Components
@@ -122,7 +136,7 @@ A customizable button component with support for different color schemes.
 ```swift
 DesignButton(
     title: "Button Title",
-    scheme: .primary, // optional
+    scheme: .primary, // optional, defaults to .primary
     action: { /* your action */ }
 )
 ```
@@ -134,12 +148,25 @@ A flexible row component that can contain any content.
 ```swift
 DesignRow(
     title: "Row Title", // optional
+    scheme: .primary, // optional, defaults to .primary
     action: { /* optional tap action */ }
 ) {
     // Your content here
     Image(systemName: "star.fill")
     Text("Some text")
 }
+```
+
+### DesignTextField
+
+A customizable text input field with support for different color schemes.
+
+```swift
+DesignTextField(
+    placeholder: "Enter your name",
+    text: $name,
+    scheme: .primary // optional, defaults to .primary
+)
 ```
 
 ### BaseView
@@ -169,6 +196,61 @@ BaseView(
 ) {
     // Your content here
 }
+```
+
+### DesignCard
+
+A container for grouping content with padding, background, and optional shadow.
+
+```swift
+DesignCard(scheme: .primary) {
+    VStack(alignment: .leading) {
+        Text("Card Title")
+            .font(.headline)
+        Text("Card content goes here.")
+    }
+}
+```
+
+### DesignToggle
+
+A styled switch for boolean values.
+
+```swift
+@State private var isOn = false
+
+DesignToggle(
+    title: "Enable notifications",
+    isOn: $isOn,
+    scheme: .primary // optional, defaults to .primary
+)
+```
+
+### DesignListItem
+
+A row with leading/trailing icons, title, subtitle, and tap action.
+
+```swift
+DesignListItem(
+    title: "List Item",
+    subtitle: "Optional subtitle",
+    scheme: .primary, // optional, defaults to .primary
+    leading: { Image(systemName: "star.fill") },
+    trailing: { Text("Detail") },
+    action: { print("Tapped!") }
+)
+```
+
+### DesignProgressBar
+
+A progress indicator with custom colors and optional label.
+
+```swift
+DesignProgressBar(
+    value: 0.7, // 0.0 ... 1.0
+    title: "Loading...",
+    scheme: .accent // optional, defaults to .accent
+)
 ```
 
 ## Requirements

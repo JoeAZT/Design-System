@@ -244,6 +244,18 @@ public struct BaseView<Content: View>: View {
 }
 
 #Preview {
+    // Example of how users can define their own colors
+    // You can set this once at the app level like:
+    // @main
+    // struct MyApp: App {
+    //     var body: some Scene {
+    //         WindowGroup {
+    //             ContentView()
+    //                 .designSystemColorProvider(MyCustomColors())
+    //         }
+    //     }
+    // }
+    
     struct MyCustomColors: DesignSystemColorProvider {
         let primaryForeground: Color = .white
         let primaryBackground: Color = .black.opacity(0.8)
@@ -253,46 +265,260 @@ public struct BaseView<Content: View>: View {
         let accentBackground: Color = .green
     }
     
+    // Simulating app-wide color provider setting
     return BaseView(
         background: MyCustomColors().createBackgroundGradient()
     ) {
         VStack(spacing: 16) {
-            // Using custom colors - set once at the top level
-            Text("Custom Colors (set once):")
+            Text("App-Wide Custom Colors:")
                 .font(.headline)
                 .padding(.bottom, 4)
             
             VStack(spacing: 8) {
-                DesignRow(title: "Custom Primary Row", action: { print("Tapped!") }) {
+                // These components automatically use the app-wide colors
+                // No need to specify .designSystemColorProvider() on each component
+                DesignRow(title: "Primary Row", action: { print("Tapped!") }) {
                     Image(systemName: "star")
                 }
                 
-                DesignRow(title: "Custom Secondary Row", scheme: .secondary, action: { print("Tapped!") }) {
+                DesignRow(title: "Secondary Row", scheme: .secondary, action: { print("Tapped!") }) {
                     Image(systemName: "heart")
                 }
                 
-                DesignRow(title: "Custom Accent Row", scheme: .accent, action: { print("Tapped!") }) {
+                DesignRow(title: "Accent Row", scheme: .accent, action: { print("Tapped!") }) {
                     Image(systemName: "bolt")
                 }
                 
                 DesignButton(
-                    title: "Custom Primary Button",
+                    title: "Primary Button",
                     action: { print("Primary tapped") }
                 )
                 
                 DesignButton(
-                    title: "Custom Secondary Button",
+                    title: "Secondary Button",
                     scheme: .secondary,
                     action: { print("Secondary tapped") }
                 )
                 
                 DesignButton(
-                    title: "Custom Accent Button",
+                    title: "Accent Button",
                     scheme: .accent,
                     action: { print("Accent tapped") }
                 )
+                
+                // Text field examples
+                DesignTextField(
+                    placeholder: "Enter your name",
+                    text: .constant("")
+                )
+                
+                DesignTextField(
+                    placeholder: "Enter your email",
+                    text: .constant(""),
+                    scheme: .accent
+                )
             }
-            .designSystemColorProvider(MyCustomColors())
         }
+        .designSystemColorProvider(MyCustomColors()) // Set once, applies to all child views
+    }
+}
+
+public struct DesignTextField: View {
+    let placeholder: String
+    @Binding var text: String
+    let scheme: DesignScheme
+    @Environment(\.designSchemeColors) private var schemeColors
+    
+    public init(
+        placeholder: String,
+        text: Binding<String>,
+        scheme: DesignScheme = .primary
+    ) {
+        self.placeholder = placeholder
+        self._text = text
+        self.scheme = scheme
+    }
+    
+    public var body: some View {
+        TextField(
+            "",
+            text: $text,
+            prompt: Text(placeholder)
+                .foregroundColor(schemeColors.colors(for: .primary).foreground)
+        )
+        .padding()
+        .foregroundColor(schemeColors.colors(for: .secondary).foreground)
+        .background(schemeColors.colors(for: .secondary).background)
+        .cornerRadius(10)
+    }
+}
+
+// MARK: - DesignCard
+public struct DesignCard<Content: View>: View {
+    let scheme: DesignScheme
+    let content: Content
+    @Environment(\.designSchemeColors) private var schemeColors
+    
+    public init(
+        scheme: DesignScheme = .primary,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.scheme = scheme
+        self.content = content()
+    }
+    
+    private var colorPair: DesignSchemeColorPair {
+        schemeColors.colors(for: scheme)
+    }
+    
+    public var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            content
+        }
+        .padding()
+        .background(colorPair.background)
+        .foregroundColor(colorPair.foreground)
+        .cornerRadius(16)
+        .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 2)
+    }
+}
+
+// MARK: - DesignToggle
+public struct DesignToggle: View {
+    let title: String
+    @Binding var isOn: Bool
+    let scheme: DesignScheme
+    @Environment(\.designSchemeColors) private var schemeColors
+    
+    public init(
+        title: String,
+        isOn: Binding<Bool>,
+        scheme: DesignScheme = .primary
+    ) {
+        self.title = title
+        self._isOn = isOn
+        self.scheme = scheme
+    }
+    
+    private var colorPair: DesignSchemeColorPair {
+        schemeColors.colors(for: scheme)
+    }
+    
+    public var body: some View {
+        Toggle(isOn: $isOn) {
+            Text(title)
+                .foregroundColor(colorPair.foreground)
+        }
+        .toggleStyle(SwitchToggleStyle(tint: colorPair.background))
+        .padding()
+        .background(colorPair.background.opacity(0.15))
+        .cornerRadius(10)
+    }
+}
+
+// MARK: - DesignListItem
+public struct DesignListItem<Leading: View, Trailing: View>: View {
+    let title: String
+    let subtitle: String?
+    let scheme: DesignScheme
+    let leading: Leading?
+    let trailing: Trailing?
+    let action: (() -> Void)?
+    @Environment(\.designSchemeColors) private var schemeColors
+    
+    public init(
+        title: String,
+        subtitle: String? = nil,
+        scheme: DesignScheme = .primary,
+        @ViewBuilder leading: () -> Leading? = { nil },
+        @ViewBuilder trailing: () -> Trailing? = { nil },
+        action: (() -> Void)? = nil
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.scheme = scheme
+        self.leading = leading()
+        self.trailing = trailing()
+        self.action = action
+    }
+    
+    private var colorPair: DesignSchemeColorPair {
+        schemeColors.colors(for: scheme)
+    }
+    
+    public var body: some View {
+        let row = HStack(spacing: 12) {
+            if let leading = leading {
+                leading
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.body)
+                if let subtitle = subtitle {
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundColor(colorPair.foreground.opacity(0.7))
+                }
+            }
+            Spacer()
+            if let trailing = trailing {
+                trailing
+            }
+        }
+        .padding()
+        .background(colorPair.background)
+        .foregroundColor(colorPair.foreground)
+        .cornerRadius(10)
+        .contentShape(Rectangle())
+        if let action = action {
+            Button(action: action) { row }
+                .buttonStyle(PlainButtonStyle())
+        } else {
+            row
+        }
+    }
+}
+
+// MARK: - DesignProgressBar
+public struct DesignProgressBar: View {
+    let value: Double // 0.0 ... 1.0
+    let title: String?
+    let scheme: DesignScheme
+    @Environment(\.designSchemeColors) private var schemeColors
+    
+    public init(
+        value: Double,
+        title: String? = nil,
+        scheme: DesignScheme = .accent
+    ) {
+        self.value = value
+        self.title = title
+        self.scheme = scheme
+    }
+    
+    private var colorPair: DesignSchemeColorPair {
+        schemeColors.colors(for: scheme)
+    }
+    
+    public var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            if let title = title {
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(colorPair.foreground)
+            }
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .frame(height: 8)
+                        .foregroundColor(colorPair.background.opacity(0.2))
+                    Capsule()
+                        .frame(width: max(0, min(CGFloat(value), 1.0)) * geometry.size.width, height: 8)
+                        .foregroundColor(colorPair.background)
+                }
+            }
+            .frame(height: 8)
+        }
+        .padding(.vertical, 4)
     }
 }
