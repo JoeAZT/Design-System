@@ -48,9 +48,21 @@ public struct DesignTextField: View {
 } 
 
 #Preview {
-    DesignTextField(
-        placeholder: "Enter your name",
-        text: .constant(""),
-        scheme: .primary
-    )
+    VStack {
+        DesignTextField(
+            placeholder: "Enter your name",
+            text: .constant(""),
+            scheme: .primary
+        )
+        DesignTextField(
+            placeholder: "Enter your name",
+            text: .constant(""),
+            scheme: .secondary
+        )
+        DesignTextField(
+            placeholder: "Enter your name",
+            text: .constant(""),
+            scheme: .accent
+        )
+    }
 }
