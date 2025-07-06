@@ -269,55 +269,172 @@ public struct BaseView<Content: View>: View {
     return BaseView(
         background: MyCustomColors().createBackgroundGradient()
     ) {
-        VStack(spacing: 16) {
-            Text("App-Wide Custom Colors:")
-                .font(.headline)
-                .padding(.bottom, 4)
-            
-            VStack(spacing: 8) {
-                // These components automatically use the app-wide colors
-                // No need to specify .designSystemColorProvider() on each component
-                DesignRow(title: "Primary Row", action: { print("Tapped!") }) {
-                    Image(systemName: "star")
+        ScrollView {
+            VStack(spacing: 16) {
+                Text("DesignSystem Components:")
+                    .font(.title)
+                    .padding(.bottom, 8)
+                
+                // DesignButton examples
+                VStack(spacing: 8) {
+                    Text("DesignButton")
+                        .font(.headline)
+                    
+                    DesignButton(
+                        title: "Primary Button",
+                        action: { print("Primary tapped") }
+                    )
+                    
+                    DesignButton(
+                        title: "Secondary Button",
+                        scheme: .secondary,
+                        action: { print("Secondary tapped") }
+                    )
+                    
+                    DesignButton(
+                        title: "Accent Button",
+                        scheme: .accent,
+                        action: { print("Accent tapped") }
+                    )
                 }
                 
-                DesignRow(title: "Secondary Row", scheme: .secondary, action: { print("Tapped!") }) {
-                    Image(systemName: "heart")
+                // DesignRow examples
+                VStack(spacing: 8) {
+                    Text("DesignRow")
+                        .font(.headline)
+                    
+                    DesignRow(title: "Primary Row", action: { print("Tapped!") }) {
+                        Image(systemName: "star")
+                    }
+                    
+                    DesignRow(title: "Secondary Row", scheme: .secondary, action: { print("Tapped!") }) {
+                        Image(systemName: "heart")
+                    }
+                    
+                    DesignRow(title: "Accent Row", scheme: .accent, action: { print("Tapped!") }) {
+                        Image(systemName: "bolt")
+                    }
                 }
                 
-                DesignRow(title: "Accent Row", scheme: .accent, action: { print("Tapped!") }) {
-                    Image(systemName: "bolt")
+                // DesignTextField examples
+                VStack(spacing: 8) {
+                    Text("DesignTextField")
+                        .font(.headline)
+                    
+                    DesignTextField(
+                        placeholder: "Enter your name",
+                        text: .constant("")
+                    )
+                    
+                    DesignTextField(
+                        placeholder: "Enter your email",
+                        text: .constant(""),
+                        scheme: .accent
+                    )
                 }
                 
-                DesignButton(
-                    title: "Primary Button",
-                    action: { print("Primary tapped") }
-                )
+                // DesignCard examples
+                VStack(spacing: 8) {
+                    Text("DesignCard")
+                        .font(.headline)
+                    
+                    DesignCard(scheme: .primary) {
+                        VStack(alignment: .leading) {
+                            Text("Primary Card")
+                                .font(.headline)
+                            Text("This is a primary card with some content.")
+                        }
+                    }
+                    
+                    DesignCard(scheme: .accent) {
+                        VStack(alignment: .leading) {
+                            Text("Accent Card")
+                                .font(.headline)
+                            Text("This is an accent card with different styling.")
+                        }
+                    }
+                }
                 
-                DesignButton(
-                    title: "Secondary Button",
-                    scheme: .secondary,
-                    action: { print("Secondary tapped") }
-                )
+                // DesignToggle examples
+                VStack(spacing: 8) {
+                    Text("DesignToggle")
+                        .font(.headline)
+                    
+                    DesignToggle(
+                        title: "Primary Toggle",
+                        isOn: .constant(true)
+                    )
+                    
+                    DesignToggle(
+                        title: "Secondary Toggle",
+                        isOn: .constant(false),
+                        scheme: .secondary
+                    )
+                    
+                    DesignToggle(
+                        title: "Accent Toggle",
+                        isOn: .constant(true),
+                        scheme: .accent
+                    )
+                }
                 
-                DesignButton(
-                    title: "Accent Button",
-                    scheme: .accent,
-                    action: { print("Accent tapped") }
-                )
+                // DesignListItem examples
+                VStack(spacing: 8) {
+                    Text("DesignListItem")
+                        .font(.headline)
+                    
+                    DesignListItem(
+                        title: "Primary List Item",
+                        subtitle: "With subtitle",
+                        leading: { Image(systemName: "star.fill") },
+                        trailing: { Text("Detail") },
+                        action: { print("Primary item tapped") }
+                    )
+                    
+                    DesignListItem(
+                        title: "Secondary List Item",
+                        subtitle: "With subtitle",
+                        scheme: .secondary,
+                        leading: { Image(systemName: "heart.fill") },
+                        trailing: { Text("Detail") },
+                        action: { print("Secondary item tapped") }
+                    )
+                    
+                    DesignListItem(
+                        title: "Accent List Item",
+                        subtitle: "With subtitle",
+                        scheme: .accent,
+                        leading: { Image(systemName: "bolt.fill") },
+                        trailing: { Text("Detail") },
+                        action: { print("Accent item tapped") }
+                    )
+                }
                 
-                // Text field examples
-                DesignTextField(
-                    placeholder: "Enter your name",
-                    text: .constant("")
-                )
-                
-                DesignTextField(
-                    placeholder: "Enter your email",
-                    text: .constant(""),
-                    scheme: .accent
-                )
+                // DesignProgressBar examples
+                VStack(spacing: 8) {
+                    Text("DesignProgressBar")
+                        .font(.headline)
+                    
+                    DesignProgressBar(
+                        value: 0.3,
+                        title: "Primary Progress",
+                        scheme: .primary
+                    )
+                    
+                    DesignProgressBar(
+                        value: 0.6,
+                        title: "Secondary Progress",
+                        scheme: .secondary
+                    )
+                    
+                    DesignProgressBar(
+                        value: 0.9,
+                        title: "Accent Progress",
+                        scheme: .accent
+                    )
+                }
             }
+            .padding()
         }
         .designSystemColorProvider(MyCustomColors()) // Set once, applies to all child views
     }
