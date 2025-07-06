@@ -110,6 +110,19 @@ public extension View {
     }
 }
 
+public extension DesignSystemColorProvider {
+    func createBackgroundGradient() -> LinearGradient {
+        LinearGradient(
+            colors: [
+                primaryBackground,
+                accentBackground.opacity(0.9)
+            ],
+            startPoint: .bottomLeading,
+            endPoint: .topTrailing
+        )
+    }
+}
+
 public struct DesignButton: View {
     let title: String
     let action: (() -> Void)?
@@ -222,11 +235,13 @@ public struct DesignRow<Content: View>: View {
 }
 
 public struct BaseView<Content: View>: View {
-    let background: Color
+    let background: LinearGradient?
     let padding: CGFloat
     let content: Content
+    @Environment(\.designSchemeColors) private var schemeColors
+    
     public init(
-        background: Color = .black,
+        background: LinearGradient? = nil,
         padding: CGFloat = 16,
         @ViewBuilder content: () -> Content
     ) {
@@ -234,10 +249,19 @@ public struct BaseView<Content: View>: View {
         self.padding = padding
         self.content = content()
     }
+    
+    private var defaultBackground: LinearGradient {
+        LinearGradient(
+            colors: [.white],
+            startPoint: .bottomLeading,
+            endPoint: .topTrailing
+        )
+    }
+    
     public var body: some View {
         content
             .padding(padding)
-            .background(background)
+            .background(background ?? defaultBackground)
             .ignoresSafeArea()
     }
 }
@@ -246,54 +270,55 @@ public struct BaseView<Content: View>: View {
     // Example of how users can define their own colors
     struct MyCustomColors: DesignSystemColorProvider {
         let primaryForeground: Color = .white
-        let primaryBackground: Color = .blue
-        let secondaryForeground: Color = .black
-        let secondaryBackground: Color = .purple
+        let primaryBackground: Color = .black.opacity(0.8)
+        let secondaryForeground: Color = .white
+        let secondaryBackground: Color = .gray
         let accentForeground: Color = .white
-        let accentBackground: Color = .orange
+        let accentBackground: Color = .green
     }
     
-    return BaseView {
-            VStack(spacing: 16) {
-                // Using custom colors - set once at the top level
-                Text("Custom Colors (set once):")
-                    .font(.headline)
-                    .padding(.bottom, 4)
-                
-                VStack(spacing: 8) {
-                    DesignRow(title: "Custom Primary Row", action: { print("Tapped!") }) {
-                        Image(systemName: "star")
-                    }
-                    
-                    DesignRow(title: "Custom Secondary Row", action: { print("Tapped!") }) {
-                        Image(systemName: "heart")
-                    }
-                    .designScheme(.secondary)
-                    
-                    DesignRow(title: "Custom Accent Row", action: { print("Tapped!") }) {
-                        Image(systemName: "bolt")
-                    }
-                    .designScheme(.accent)
-                    
-                    DesignButton(
-                        title: "Custom Primary Button",
-                        action: { print("Primary tapped") }
-                    )
-                    
-                    DesignButton(
-                        title: "Custom Secondary Button",
-                        action: { print("Secondary tapped") }
-                    )
-                    .designScheme(.secondary)
-                    
-                    DesignButton(
-                        title: "Custom Accent Button",
-                        action: { print("Accent tapped") }
-                    )
-                    .designScheme(.accent)
+    return BaseView(
+        background: MyCustomColors().createBackgroundGradient()
+    ) {
+        VStack(spacing: 16) {
+            // Using custom colors - set once at the top level
+            Text("Custom Colors (set once):")
+                .font(.headline)
+                .padding(.bottom, 4)
+            
+            VStack(spacing: 8) {
+                DesignRow(title: "Custom Primary Row", action: { print("Tapped!") }) {
+                    Image(systemName: "star")
                 }
-                .designSystemColorProvider(MyCustomColors())
+                
+                DesignRow(title: "Custom Secondary Row", action: { print("Tapped!") }) {
+                    Image(systemName: "heart")
+                }
+                .designScheme(.secondary)
+                
+                DesignRow(title: "Custom Accent Row", action: { print("Tapped!") }) {
+                    Image(systemName: "bolt")
+                }
+                .designScheme(.accent)
+                
+                DesignButton(
+                    title: "Custom Primary Button",
+                    action: { print("Primary tapped") }
+                )
+                
+                DesignButton(
+                    title: "Custom Secondary Button",
+                    action: { print("Secondary tapped") }
+                )
+                .designScheme(.secondary)
+                
+                DesignButton(
+                    title: "Custom Accent Button",
+                    action: { print("Accent tapped") }
+                )
+                .designScheme(.accent)
             }
-//        }
+            .designSystemColorProvider(MyCustomColors())
+        }
     }
 }

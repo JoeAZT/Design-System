@@ -144,12 +144,28 @@ DesignRow(
 
 ### BaseView
 
-A foundation view that provides background color and padding.
+A foundation view that provides background gradient and padding. You can use your custom colors to create a background gradient.
 
 ```swift
+// Using default background
+BaseView {
+    // Your content here
+}
+
+// Using custom background gradient from your color provider
 BaseView(
-    background: .black,
-    padding: 16
+    background: MyCustomColors().createBackgroundGradient()
+) {
+    // Your content here
+}
+
+// Using a completely custom gradient
+BaseView(
+    background: LinearGradient(
+        colors: [.blue, .purple],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
 ) {
     // Your content here
 }
