@@ -19,30 +19,52 @@ public struct BaseView<Content: View>: View {
     let background: LinearGradient?
     let padding: CGFloat
     let content: Content
+    let alignment: HorizontalAlignment
     @Environment(\.designSchemeColors) private var schemeColors
     
     public init(
         background: LinearGradient? = nil,
         padding: CGFloat = 16,
+        alignment: HorizontalAlignment = .leading,
         @ViewBuilder content: () -> Content
     ) {
         self.background = background
         self.padding = padding
+        self.alignment = alignment
         self.content = content()
     }
     
     private var defaultBackground: LinearGradient {
         LinearGradient(
-            colors: [.white],
+            colors: [
+                schemeColors.background.background,
+                schemeColors.background.background,
+                schemeColors.background.background,
+                schemeColors.background.background,
+                schemeColors.background.foreground
+            ],
             startPoint: .bottomLeading,
             endPoint: .topTrailing
         )
     }
     
     public var body: some View {
-        content
-            .padding(padding)
-            .background(background ?? defaultBackground)
-            .ignoresSafeArea()
+        ZStack {
+            Rectangle()
+                .fill(schemeColors.background.background)
+                .ignoresSafeArea()
+            VStack(alignment: alignment) {
+                content
+                    .padding(padding)
+                    .background(background ?? defaultBackground)
+                    .ignoresSafeArea()
+            }
+        }
     }
-} 
+}
+
+#Preview {
+    BaseView {
+        Text("something here")
+    }
+}

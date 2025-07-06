@@ -29,16 +29,28 @@ public struct DesignTextField: View {
         self.scheme = scheme
     }
     
+    private var colorPair: DesignSchemeColorPair {
+        schemeColors.colors(for: scheme)
+    }
+    
     public var body: some View {
         TextField(
             "",
             text: $text,
             prompt: Text(placeholder)
-                .foregroundColor(schemeColors.colors(for: .primary).foreground)
+            .foregroundColor(colorPair.foreground)
         )
         .padding()
-        .foregroundColor(schemeColors.colors(for: .secondary).foreground)
-        .background(schemeColors.colors(for: .secondary).background)
+        .foregroundColor(colorPair.foreground)
+        .background(colorPair.background)
         .cornerRadius(10)
     }
 } 
+
+#Preview {
+    DesignTextField(
+        placeholder: "Enter your name",
+        text: .constant(""),
+        scheme: .primary
+    )
+}

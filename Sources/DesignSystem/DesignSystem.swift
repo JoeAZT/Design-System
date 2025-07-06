@@ -48,6 +48,8 @@ import SwiftUI
 
 // MARK: - User-Defined Colors Protocol
 public protocol DesignSystemColorProvider: Sendable {
+    var backgroundColor: Color { get }
+    var backgroundVariantColor: Color { get }
     var primaryForeground: Color { get }
     var primaryBackground: Color { get }
     var secondaryForeground: Color { get }
@@ -58,6 +60,8 @@ public protocol DesignSystemColorProvider: Sendable {
 
 // MARK: - Default Color Provider
 public struct DefaultDesignSystemColors: DesignSystemColorProvider {
+    public var backgroundColor: Color = .black
+    public var backgroundVariantColor: Color = .gray.opacity(0.1)
     public let primaryForeground: Color = .white
     public let primaryBackground: Color = .gray
     public let secondaryForeground: Color = .white
@@ -82,21 +86,28 @@ public struct DesignSchemeColorPair: Sendable {
 }
 
 public struct DesignSchemeColors: Sendable {
+    public let background: DesignSchemeColorPair
     public let primary: DesignSchemeColorPair
     public let secondary: DesignSchemeColorPair
     public let accent: DesignSchemeColorPair
     
     public init(
-        primary: DesignSchemeColorPair = .init(foreground: .white, background: .gray),
-        secondary: DesignSchemeColorPair = .init(foreground: .white, background: .gray),
+        background: DesignSchemeColorPair = .init(foreground: .white, background: .black),
+        primary: DesignSchemeColorPair = .init(foreground: .white, background: .black),
+        secondary: DesignSchemeColorPair = .init(foreground: .white, background: .red),
         accent: DesignSchemeColorPair = .init(foreground: .white, background: .green)
     ) {
+        self.background = background
         self.primary = primary
         self.secondary = secondary
         self.accent = accent
     }
     
     public init(from provider: DesignSystemColorProvider) {
+        self.background = DesignSchemeColorPair(
+            foreground: provider.backgroundColor,
+            background: provider.backgroundVariantColor
+        )
         self.primary = DesignSchemeColorPair(
             foreground: provider.primaryForeground,
             background: provider.primaryBackground
@@ -156,32 +167,19 @@ public extension View {
     }
 }
 
-public extension DesignSystemColorProvider {
-    func createBackgroundGradient() -> LinearGradient {
-        LinearGradient(
-            colors: [
-                primaryBackground,
-                accentBackground.opacity(0.9)
-            ],
-            startPoint: .bottomLeading,
-            endPoint: .topTrailing
-        )
-    }
-}
-
 #Preview {
     struct MyCustomColors: DesignSystemColorProvider {
+        var backgroundColor: Color = .black
+        var backgroundVariantColor: Color = .green
         let primaryForeground: Color = .white
-        let primaryBackground: Color = .black.opacity(0.8)
+        let primaryBackground: Color = .white.opacity(0.25)
         let secondaryForeground: Color = .white
-        let secondaryBackground: Color = .gray
+        let secondaryBackground: Color = .white.opacity(0.5)
         let accentForeground: Color = .white
         let accentBackground: Color = .green
     }
     
-    return BaseView(
-        background: MyCustomColors().createBackgroundGradient()
-    ) {
+    return BaseView {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("DesignSystem Components:")
@@ -237,7 +235,7 @@ public extension DesignSystemColorProvider {
                 DesignTextField(
                     placeholder: "Enter your email",
                     text: .constant(""),
-                    scheme: .accent
+                    scheme: .secondary
                 )
                 
                 // DesignCard examples
