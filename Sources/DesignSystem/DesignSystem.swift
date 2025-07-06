@@ -1,3 +1,49 @@
+/**
+# DesignSystem
+
+A SwiftUI-first design system library for iOS, providing a set of customizable, theme-aware UI components. 
+
+## Features
+- Consistent color schemes and theming via a color provider protocol
+- App-wide color configuration with environment propagation
+- Ready-to-use, accessible components: Button, Row, Card, Toggle, ListItem, ProgressBar, TextField, and more
+- Easy integration: just `import DesignSystem` in your app
+- Modern SwiftUI patterns and best practices
+
+## Usage
+1. Define your color palette by conforming to `DesignSystemColorProvider`.
+2. Set your color provider at the app or root view level using `.designSystemColorProvider(...)`.
+3. Use any DesignSystem component in your views. All components will automatically use your color scheme.
+
+## Example
+```swift
+import DesignSystem
+
+struct MyColors: DesignSystemColorProvider { ... }
+
+@main
+struct MyApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .designSystemColorProvider(MyColors())
+        }
+    }
+}
+```
+
+## Components
+- `DesignButton`
+- `DesignRow`
+- `DesignTextField`
+- `DesignCard`
+- `DesignToggle`
+- `DesignListItem`
+- `DesignProgressBar`
+- `BaseView`
+
+All components are public and available with a single `import DesignSystem`.
+*/
 import SwiftUI
 
 // MARK: - User-Defined Colors Protocol
@@ -91,7 +137,7 @@ public extension EnvironmentValues {
     
     var designSystemColorProvider: DesignSystemColorProvider {
         get { self[ColorProviderKey.self] }
-        set { 
+        set {
             self[ColorProviderKey.self] = newValue
             // Automatically update the design scheme colors when provider changes
             self[DesignSchemeKey.self] = DesignSchemeColors(from: newValue)
@@ -123,139 +169,7 @@ public extension DesignSystemColorProvider {
     }
 }
 
-public struct DesignButton: View {
-    let title: String
-    let action: (() -> Void)?
-    let scheme: DesignScheme
-    @Environment(\.designSchemeColors) private var schemeColors
-    
-    public init(
-        title: String,
-        scheme: DesignScheme = .primary,
-        action: (() -> Void)? = nil
-    ) {
-        self.title = title
-        self.scheme = scheme
-        self.action = action
-    }
-
-    private var colorPair: DesignSchemeColorPair {
-        schemeColors.colors(for: scheme)
-    }
-
-    public var body: some View {
-        let button = Text(title)
-            .font(.headline)
-            .foregroundColor(colorPair.foreground)
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(colorPair.background)
-            .cornerRadius(10)
-        if let action = action {
-            Button(action: action) { button }
-                .buttonStyle(PlainButtonStyle())
-        } else {
-            button
-        }
-    }
-}
-
-public struct DesignRow<Content: View>: View {
-    let title: String?
-    let scheme: DesignScheme
-    let action: (() -> Void)?
-    let content: Content
-    @Environment(\.designSchemeColors) private var schemeColors
-
-    public init(
-        title: String? = nil,
-        scheme: DesignScheme = .primary,
-        action: (() -> Void)? = nil,
-        @ViewBuilder content: () -> Content
-    ) {
-        self.title = title
-        self.scheme = scheme
-        self.action = action
-        self.content = content()
-    }
-
-    private var colorPair: DesignSchemeColorPair {
-        schemeColors.colors(for: scheme)
-    }
-
-    public var body: some View {
-        let row = VStack(alignment: .leading, spacing: 8) {
-            if let title = title {
-                Text(title)
-                    .font(.headline)
-            }
-            HStack {
-                content
-                Spacer()
-            }
-        }
-        .foregroundColor(colorPair.foreground)
-        .padding()
-        .background(colorPair.background)
-        .cornerRadius(10)
-        .contentShape(Rectangle())
-
-        if let action = action {
-            Button(action: action) {
-                row
-            }
-            .buttonStyle(PlainButtonStyle())
-        } else {
-            row
-        }
-    }
-}
-
-public struct BaseView<Content: View>: View {
-    let background: LinearGradient?
-    let padding: CGFloat
-    let content: Content
-    @Environment(\.designSchemeColors) private var schemeColors
-    
-    public init(
-        background: LinearGradient? = nil,
-        padding: CGFloat = 16,
-        @ViewBuilder content: () -> Content
-    ) {
-        self.background = background
-        self.padding = padding
-        self.content = content()
-    }
-    
-    private var defaultBackground: LinearGradient {
-        LinearGradient(
-            colors: [.white],
-            startPoint: .bottomLeading,
-            endPoint: .topTrailing
-        )
-    }
-    
-    public var body: some View {
-        content
-            .padding(padding)
-            .background(background ?? defaultBackground)
-            .ignoresSafeArea()
-    }
-}
-
 #Preview {
-    // Example of how users can define their own colors
-    // You can set this once at the app level like:
-    // @main
-    // struct MyApp: App {
-    //     var body: some Scene {
-    //         WindowGroup {
-    //             ContentView()
-    //                 .designSystemColorProvider(MyCustomColors())
-    //         }
-    //     }
-    // }
-    
     struct MyCustomColors: DesignSystemColorProvider {
         let primaryForeground: Color = .white
         let primaryBackground: Color = .black.opacity(0.8)
@@ -265,377 +179,162 @@ public struct BaseView<Content: View>: View {
         let accentBackground: Color = .green
     }
     
-    // Simulating app-wide color provider setting
     return BaseView(
         background: MyCustomColors().createBackgroundGradient()
     ) {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 16) {
                 Text("DesignSystem Components:")
                     .font(.title)
                     .padding(.bottom, 8)
                 
                 // DesignButton examples
-                VStack(spacing: 8) {
-                    Text("DesignButton")
-                        .font(.headline)
-                    
-                    DesignButton(
-                        title: "Primary Button",
-                        action: { print("Primary tapped") }
-                    )
-                    
-                    DesignButton(
-                        title: "Secondary Button",
-                        scheme: .secondary,
-                        action: { print("Secondary tapped") }
-                    )
-                    
-                    DesignButton(
-                        title: "Accent Button",
-                        scheme: .accent,
-                        action: { print("Accent tapped") }
-                    )
-                }
+                Text("DesignButton")
+                    .font(.headline)
+                
+                DesignButton(
+                    title: "Primary Button",
+                    action: { print("Primary tapped") }
+                )
+                
+                DesignButton(
+                    title: "Secondary Button",
+                    scheme: .secondary,
+                    action: { print("Secondary tapped") }
+                )
+                
+                DesignButton(
+                    title: "Accent Button",
+                    scheme: .accent,
+                    action: { print("Accent tapped") }
+                )
                 
                 // DesignRow examples
-                VStack(spacing: 8) {
-                    Text("DesignRow")
-                        .font(.headline)
-                    
-                    DesignRow(title: "Primary Row", action: { print("Tapped!") }) {
-                        Image(systemName: "star")
-                    }
-                    
-                    DesignRow(title: "Secondary Row", scheme: .secondary, action: { print("Tapped!") }) {
-                        Image(systemName: "heart")
-                    }
-                    
-                    DesignRow(title: "Accent Row", scheme: .accent, action: { print("Tapped!") }) {
-                        Image(systemName: "bolt")
-                    }
+                Text("DesignRow")
+                    .font(.headline)
+                
+                DesignRow(title: "Primary Row", action: { print("Tapped!") }) {
+                    Image(systemName: "star")
+                }
+                
+                DesignRow(title: "Secondary Row", scheme: .secondary, action: { print("Tapped!") }) {
+                    Image(systemName: "heart")
+                }
+                
+                DesignRow(title: "Accent Row", scheme: .accent, action: { print("Tapped!") }) {
+                    Image(systemName: "bolt")
                 }
                 
                 // DesignTextField examples
-                VStack(spacing: 8) {
-                    Text("DesignTextField")
-                        .font(.headline)
-                    
-                    DesignTextField(
-                        placeholder: "Enter your name",
-                        text: .constant("")
-                    )
-                    
-                    DesignTextField(
-                        placeholder: "Enter your email",
-                        text: .constant(""),
-                        scheme: .accent
-                    )
-                }
+                Text("DesignTextField")
+                    .font(.headline)
+                
+                DesignTextField(
+                    placeholder: "Enter your name",
+                    text: .constant("")
+                )
+                
+                DesignTextField(
+                    placeholder: "Enter your email",
+                    text: .constant(""),
+                    scheme: .accent
+                )
                 
                 // DesignCard examples
-                VStack(spacing: 8) {
-                    Text("DesignCard")
-                        .font(.headline)
-                    
-                    DesignCard(scheme: .primary) {
-                        VStack(alignment: .leading) {
-                            Text("Primary Card")
-                                .font(.headline)
-                            Text("This is a primary card with some content.")
-                        }
+                Text("DesignCard")
+                    .font(.headline)
+                
+                DesignCard(scheme: .primary) {
+                    VStack(alignment: .leading) {
+                        Text("Primary Card")
+                            .font(.headline)
+                        Text("This is a primary card with some content.")
                     }
-                    
-                    DesignCard(scheme: .accent) {
-                        VStack(alignment: .leading) {
-                            Text("Accent Card")
-                                .font(.headline)
-                            Text("This is an accent card with different styling.")
-                        }
+                }
+                
+                DesignCard(scheme: .accent) {
+                    VStack(alignment: .leading) {
+                        Text("Accent Card")
+                            .font(.headline)
+                        Text("This is an accent card with different styling.")
                     }
                 }
                 
                 // DesignToggle examples
-                VStack(spacing: 8) {
-                    Text("DesignToggle")
-                        .font(.headline)
-                    
-                    DesignToggle(
-                        title: "Primary Toggle",
-                        isOn: .constant(true)
-                    )
-                    
-                    DesignToggle(
-                        title: "Secondary Toggle",
-                        isOn: .constant(false),
-                        scheme: .secondary
-                    )
-                    
-                    DesignToggle(
-                        title: "Accent Toggle",
-                        isOn: .constant(true),
-                        scheme: .accent
-                    )
-                }
+                Text("DesignToggle")
+                    .font(.headline)
+                
+                DesignToggle(
+                    title: "Primary Toggle",
+                    isOn: .constant(true)
+                )
+                
+                DesignToggle(
+                    title: "Secondary Toggle",
+                    isOn: .constant(false),
+                    scheme: .secondary
+                )
+                
+                DesignToggle(
+                    title: "Accent Toggle",
+                    isOn: .constant(true),
+                    scheme: .accent
+                )
                 
                 // DesignListItem examples
-                VStack(spacing: 8) {
-                    Text("DesignListItem")
-                        .font(.headline)
-                    
-                    DesignListItem(
-                        title: "Primary List Item",
-                        subtitle: "With subtitle",
-                        leading: { Image(systemName: "star.fill") },
-                        trailing: { Text("Detail") },
-                        action: { print("Primary item tapped") }
-                    )
-                    
-                    DesignListItem(
-                        title: "Secondary List Item",
-                        subtitle: "With subtitle",
-                        scheme: .secondary,
-                        leading: { Image(systemName: "heart.fill") },
-                        trailing: { Text("Detail") },
-                        action: { print("Secondary item tapped") }
-                    )
-                    
-                    DesignListItem(
-                        title: "Accent List Item",
-                        subtitle: "With subtitle",
-                        scheme: .accent,
-                        leading: { Image(systemName: "bolt.fill") },
-                        trailing: { Text("Detail") },
-                        action: { print("Accent item tapped") }
-                    )
-                }
+                Text("DesignListItem")
+                    .font(.headline)
+                
+                DesignListItem(
+                    title: "Primary List Item",
+                    subtitle: "With subtitle",
+                    leading: { Image(systemName: "star.fill") },
+                    trailing: { Text("Detail") },
+                    action: { print("Primary item tapped") }
+                )
+                
+                DesignListItem(
+                    title: "Secondary List Item",
+                    subtitle: "With subtitle",
+                    scheme: .secondary,
+                    leading: { Image(systemName: "heart.fill") },
+                    trailing: { Text("Detail") },
+                    action: { print("Secondary item tapped") }
+                )
+                
+                DesignListItem(
+                    title: "Accent List Item",
+                    subtitle: "With subtitle",
+                    scheme: .accent,
+                    leading: { Image(systemName: "bolt.fill") },
+                    trailing: { Text("Detail") },
+                    action: { print("Accent item tapped") }
+                )
                 
                 // DesignProgressBar examples
-                VStack(spacing: 8) {
-                    Text("DesignProgressBar")
-                        .font(.headline)
-                    
-                    DesignProgressBar(
-                        value: 0.3,
-                        title: "Primary Progress",
-                        scheme: .primary
-                    )
-                    
-                    DesignProgressBar(
-                        value: 0.6,
-                        title: "Secondary Progress",
-                        scheme: .secondary
-                    )
-                    
-                    DesignProgressBar(
-                        value: 0.9,
-                        title: "Accent Progress",
-                        scheme: .accent
-                    )
-                }
+                Text("DesignProgressBar")
+                    .font(.headline)
+                
+                DesignProgressBar(
+                    value: 0.3,
+                    title: "Primary Progress",
+                    scheme: .primary
+                )
+                
+                DesignProgressBar(
+                    value: 0.6,
+                    title: "Secondary Progress",
+                    scheme: .secondary
+                )
+                
+                DesignProgressBar(
+                    value: 0.9,
+                    title: "Accent Progress",
+                    scheme: .accent
+                )
             }
             .padding()
         }
         .designSystemColorProvider(MyCustomColors()) // Set once, applies to all child views
-    }
-}
-
-public struct DesignTextField: View {
-    let placeholder: String
-    @Binding var text: String
-    let scheme: DesignScheme
-    @Environment(\.designSchemeColors) private var schemeColors
-    
-    public init(
-        placeholder: String,
-        text: Binding<String>,
-        scheme: DesignScheme = .primary
-    ) {
-        self.placeholder = placeholder
-        self._text = text
-        self.scheme = scheme
-    }
-    
-    public var body: some View {
-        TextField(
-            "",
-            text: $text,
-            prompt: Text(placeholder)
-                .foregroundColor(schemeColors.colors(for: .primary).foreground)
-        )
-        .padding()
-        .foregroundColor(schemeColors.colors(for: .secondary).foreground)
-        .background(schemeColors.colors(for: .secondary).background)
-        .cornerRadius(10)
-    }
-}
-
-// MARK: - DesignCard
-public struct DesignCard<Content: View>: View {
-    let scheme: DesignScheme
-    let content: Content
-    @Environment(\.designSchemeColors) private var schemeColors
-    
-    public init(
-        scheme: DesignScheme = .primary,
-        @ViewBuilder content: () -> Content
-    ) {
-        self.scheme = scheme
-        self.content = content()
-    }
-    
-    private var colorPair: DesignSchemeColorPair {
-        schemeColors.colors(for: scheme)
-    }
-    
-    public var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            content
-        }
-        .padding()
-        .background(colorPair.background)
-        .foregroundColor(colorPair.foreground)
-        .cornerRadius(16)
-        .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 2)
-    }
-}
-
-// MARK: - DesignToggle
-public struct DesignToggle: View {
-    let title: String
-    @Binding var isOn: Bool
-    let scheme: DesignScheme
-    @Environment(\.designSchemeColors) private var schemeColors
-    
-    public init(
-        title: String,
-        isOn: Binding<Bool>,
-        scheme: DesignScheme = .primary
-    ) {
-        self.title = title
-        self._isOn = isOn
-        self.scheme = scheme
-    }
-    
-    private var colorPair: DesignSchemeColorPair {
-        schemeColors.colors(for: scheme)
-    }
-    
-    public var body: some View {
-        Toggle(isOn: $isOn) {
-            Text(title)
-                .foregroundColor(colorPair.foreground)
-        }
-        .toggleStyle(SwitchToggleStyle(tint: colorPair.background))
-        .padding()
-        .background(colorPair.background.opacity(0.15))
-        .cornerRadius(10)
-    }
-}
-
-// MARK: - DesignListItem
-public struct DesignListItem<Leading: View, Trailing: View>: View {
-    let title: String
-    let subtitle: String?
-    let scheme: DesignScheme
-    let leading: Leading?
-    let trailing: Trailing?
-    let action: (() -> Void)?
-    @Environment(\.designSchemeColors) private var schemeColors
-    
-    public init(
-        title: String,
-        subtitle: String? = nil,
-        scheme: DesignScheme = .primary,
-        @ViewBuilder leading: () -> Leading? = { nil },
-        @ViewBuilder trailing: () -> Trailing? = { nil },
-        action: (() -> Void)? = nil
-    ) {
-        self.title = title
-        self.subtitle = subtitle
-        self.scheme = scheme
-        self.leading = leading()
-        self.trailing = trailing()
-        self.action = action
-    }
-    
-    private var colorPair: DesignSchemeColorPair {
-        schemeColors.colors(for: scheme)
-    }
-    
-    public var body: some View {
-        let row = HStack(spacing: 12) {
-            if let leading = leading {
-                leading
-            }
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.body)
-                if let subtitle = subtitle {
-                    Text(subtitle)
-                        .font(.caption)
-                        .foregroundColor(colorPair.foreground.opacity(0.7))
-                }
-            }
-            Spacer()
-            if let trailing = trailing {
-                trailing
-            }
-        }
-        .padding()
-        .background(colorPair.background)
-        .foregroundColor(colorPair.foreground)
-        .cornerRadius(10)
-        .contentShape(Rectangle())
-        if let action = action {
-            Button(action: action) { row }
-                .buttonStyle(PlainButtonStyle())
-        } else {
-            row
-        }
-    }
-}
-
-// MARK: - DesignProgressBar
-public struct DesignProgressBar: View {
-    let value: Double // 0.0 ... 1.0
-    let title: String?
-    let scheme: DesignScheme
-    @Environment(\.designSchemeColors) private var schemeColors
-    
-    public init(
-        value: Double,
-        title: String? = nil,
-        scheme: DesignScheme = .accent
-    ) {
-        self.value = value
-        self.title = title
-        self.scheme = scheme
-    }
-    
-    private var colorPair: DesignSchemeColorPair {
-        schemeColors.colors(for: scheme)
-    }
-    
-    public var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            if let title = title {
-                Text(title)
-                    .font(.caption)
-                    .foregroundColor(colorPair.foreground)
-            }
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .frame(height: 8)
-                        .foregroundColor(colorPair.background.opacity(0.2))
-                    Capsule()
-                        .frame(width: max(0, min(CGFloat(value), 1.0)) * geometry.size.width, height: 8)
-                        .foregroundColor(colorPair.background)
-                }
-            }
-            .frame(height: 8)
-        }
-        .padding(.vertical, 4)
     }
 }

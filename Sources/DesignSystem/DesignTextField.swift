@@ -1,0 +1,44 @@
+import SwiftUI
+
+/// A theme-aware text field for user input, styled according to your design system.
+///
+/// Use `DesignTextField` for text input fields that automatically match your app's color scheme. The placeholder uses the primary foreground color, while the text and background use the secondary scheme.
+///
+/// - Parameters:
+///   - placeholder: The placeholder text to display when the field is empty.
+///   - text: A binding to the text value.
+///   - scheme: The color scheme to use for the text field. Defaults to .primary (but the field always uses secondary colors for text/background).
+///
+/// Example:
+/// ```swift
+/// DesignTextField(placeholder: "Email", text: $email)
+/// ```
+public struct DesignTextField: View {
+    let placeholder: String
+    @Binding var text: String
+    let scheme: DesignScheme
+    @Environment(\.designSchemeColors) private var schemeColors
+    
+    public init(
+        placeholder: String,
+        text: Binding<String>,
+        scheme: DesignScheme = .primary
+    ) {
+        self.placeholder = placeholder
+        self._text = text
+        self.scheme = scheme
+    }
+    
+    public var body: some View {
+        TextField(
+            "",
+            text: $text,
+            prompt: Text(placeholder)
+                .foregroundColor(schemeColors.colors(for: .primary).foreground)
+        )
+        .padding()
+        .foregroundColor(schemeColors.colors(for: .secondary).foreground)
+        .background(schemeColors.colors(for: .secondary).background)
+        .cornerRadius(10)
+    }
+} 
