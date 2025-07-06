@@ -56,24 +56,40 @@ struct MyCustomColors: DesignSystemColorProvider {
 }
 ```
 
-Then apply your custom colors to your views:
+Then apply your custom colors to your views by setting the color provider once at the top level:
 
 ```swift
 struct ContentView: View {
     var body: some View {
         BaseView {
             VStack(spacing: 16) {
+                // All components below will automatically use your custom colors
                 DesignButton(
-                    title: "Custom Button",
+                    title: "Primary Button",
                     action: { print("Button tapped!") }
                 )
-                .designSystemColorProvider(MyCustomColors())
                 
-                DesignRow(title: "Custom Row") {
+                DesignButton(
+                    title: "Secondary Button",
+                    scheme: .secondary,
+                    action: { print("Secondary tapped!") }
+                )
+                
+                DesignButton(
+                    title: "Accent Button",
+                    scheme: .accent,
+                    action: { print("Accent tapped!") }
+                )
+                
+                DesignRow(title: "Primary Row") {
                     Image(systemName: "star.fill")
                 }
-                .designSystemColorProvider(MyCustomColors())
+                
+                DesignRow(title: "Accent Row", scheme: .accent) {
+                    Image(systemName: "bolt.fill")
+                }
             }
+            .designSystemColorProvider(MyCustomColors())
         }
     }
 }

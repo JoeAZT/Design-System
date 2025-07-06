@@ -157,25 +157,39 @@ public extension DesignButton {
     }
 }
 
+public extension DesignRow {
+    func designScheme(_ scheme: DesignScheme) -> DesignRow<Content> {
+        DesignRow(title: self.title, scheme: scheme, action: self.action) {
+            self.content
+        }
+    }
+}
+
 public struct DesignRow<Content: View>: View {
     let title: String?
-    let foregroundColor: Color
-    let backgroundColor: Color
+    let scheme: DesignScheme?
     let action: (() -> Void)?
     let content: Content
+    @Environment(\.designSchemeColors) private var schemeColors
 
     public init(
         title: String? = nil,
-        foregroundColor: Color = .white,
-        backgroundColor: Color = .red,
+        scheme: DesignScheme? = nil,
         action: (() -> Void)? = nil,
         @ViewBuilder content: () -> Content
     ) {
         self.title = title
-        self.foregroundColor = foregroundColor
-        self.backgroundColor = backgroundColor
+        self.scheme = scheme
         self.action = action
         self.content = content()
+    }
+
+    private var colorPair: DesignSchemeColorPair {
+        if let scheme = scheme {
+            return schemeColors.colors(for: scheme)
+        } else {
+            return schemeColors.colors(for: .primary)
+        }
     }
 
     public var body: some View {
@@ -190,9 +204,9 @@ public struct DesignRow<Content: View>: View {
                 
             }
         }
-        .foregroundColor(foregroundColor)
+        .foregroundColor(colorPair.foreground)
         .padding()
-        .background(backgroundColor)
+        .background(colorPair.background)
         .cornerRadius(10)
         .contentShape(Rectangle())
 
@@ -240,52 +254,46 @@ public struct BaseView<Content: View>: View {
     }
     
     return BaseView {
-        VStack(spacing: 8) {
-            // Using default colors
-            Text("Default Colors:")
-                .font(.headline)
-                .padding(.bottom, 4)
-            
-            DesignRow(title: "Default Row", action: { print("Tapped!") }) {
-                Image(systemName: "star")
+            VStack(spacing: 16) {
+                // Using custom colors - set once at the top level
+                Text("Custom Colors (set once):")
+                    .font(.headline)
+                    .padding(.bottom, 4)
+                
+                VStack(spacing: 8) {
+                    DesignRow(title: "Custom Primary Row", action: { print("Tapped!") }) {
+                        Image(systemName: "star")
+                    }
+                    
+                    DesignRow(title: "Custom Secondary Row", action: { print("Tapped!") }) {
+                        Image(systemName: "heart")
+                    }
+                    .designScheme(.secondary)
+                    
+                    DesignRow(title: "Custom Accent Row", action: { print("Tapped!") }) {
+                        Image(systemName: "bolt")
+                    }
+                    .designScheme(.accent)
+                    
+                    DesignButton(
+                        title: "Custom Primary Button",
+                        action: { print("Primary tapped") }
+                    )
+                    
+                    DesignButton(
+                        title: "Custom Secondary Button",
+                        action: { print("Secondary tapped") }
+                    )
+                    .designScheme(.secondary)
+                    
+                    DesignButton(
+                        title: "Custom Accent Button",
+                        action: { print("Accent tapped") }
+                    )
+                    .designScheme(.accent)
+                }
+                .designSystemColorProvider(MyCustomColors())
             }
-            
-            DesignButton(
-                title: "Default Primary Button",
-                action: { print("Primary tapped") }
-            )
-            
-            DesignButton(
-                title: "Default Accent Button",
-                action: { print("Accent tapped") }
-            )
-            .designScheme(.accent)
-            
-            Divider()
-                .padding(.vertical)
-            
-            // Using custom colors
-            Text("Custom Colors:")
-                .font(.headline)
-                .padding(.bottom, 4)
-            
-            DesignRow(title: "Custom Row", action: { print("Tapped!") }) {
-                Image(systemName: "star")
-            }
-            .designSystemColorProvider(MyCustomColors())
-            
-            DesignButton(
-                title: "Custom Primary Button",
-                action: { print("Primary tapped") }
-            )
-            .designSystemColorProvider(MyCustomColors())
-            
-            DesignButton(
-                title: "Custom Accent Button",
-                action: { print("Accent tapped") }
-            )
-            .designScheme(.accent)
-            .designSystemColorProvider(MyCustomColors())
-        }
+//        }
     }
 }
