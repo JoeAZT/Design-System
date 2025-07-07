@@ -26,8 +26,8 @@ public struct DesignListItem<Leading: View, Trailing: View>: View {
     let title: String
     let subtitle: String?
     let scheme: DesignScheme
-    let leading: Leading?
-    let trailing: Trailing?
+    let leading: Leading
+    let trailing: Trailing
     let action: (() -> Void)?
     @Environment(\.designSchemeColors) private var schemeColors
     
@@ -35,8 +35,8 @@ public struct DesignListItem<Leading: View, Trailing: View>: View {
         title: String,
         subtitle: String? = nil,
         scheme: DesignScheme = .primary,
-        @ViewBuilder leading: () -> Leading? = { nil },
-        @ViewBuilder trailing: () -> Trailing? = { nil },
+        @ViewBuilder leading: () -> Leading = { EmptyView() },
+        @ViewBuilder trailing: () -> Trailing = { EmptyView() },
         action: (() -> Void)? = nil
     ) {
         self.title = title
@@ -53,9 +53,7 @@ public struct DesignListItem<Leading: View, Trailing: View>: View {
     
     public var body: some View {
         let row = HStack(spacing: 12) {
-            if let leading = leading {
-                leading
-            }
+            leading
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.body)
@@ -66,9 +64,7 @@ public struct DesignListItem<Leading: View, Trailing: View>: View {
                 }
             }
             Spacer()
-            if let trailing = trailing {
-                trailing
-            }
+            trailing
         }
         .padding()
         .background(colorPair.background)
