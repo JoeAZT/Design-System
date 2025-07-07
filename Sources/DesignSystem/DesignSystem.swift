@@ -71,7 +71,7 @@ public protocol DesignSystemColorProvider: Sendable {
 /// The default color provider used if no custom provider is set.
 public struct DefaultDesignSystemColors: DesignSystemColorProvider {
     public var backgroundColor: Color = .black
-    public var backgroundVariantColor: Color = .gray.opacity(0.1)
+    public var backgroundVariantColor: Color = .black.opacity(0.99)
     public let primaryForeground: Color = .white
     public let primaryBackground: Color = .gray
     public let secondaryForeground: Color = .white

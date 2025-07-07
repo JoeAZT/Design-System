@@ -53,7 +53,7 @@ public struct BaseView<Content: View>: View {
             content
                 .padding(padding)
         }
-        .foregroundStyle(schemeColors.background.foreground)
+        .foregroundStyle(schemeColors.primary.foreground)
         .background(background ?? defaultBackground)
         .ignoresSafeArea()
     }
