@@ -74,7 +74,7 @@ public struct DefaultDesignSystemColors: DesignSystemColorProvider {
     public var backgroundVariantColor: Color = .black.opacity(0.99)
     public let primaryForeground: Color = .white
     public let primaryBackground: Color = .gray
-    public let secondaryForeground: Color = .white
+    public let secondaryForeground: Color = .purple
     public let secondaryBackground: Color = .gray
     public let accentForeground: Color = .white
     public let accentBackground: Color = .green
@@ -158,36 +158,23 @@ public struct DesignSchemeColors: Sendable {
 }
 
 // MARK: - Environment Keys
-private struct DesignSchemeKey: EnvironmentKey {
-    static let defaultValue = DesignSchemeColors()
-}
-
 private struct ColorProviderKey: EnvironmentKey {
     static let defaultValue: DesignSystemColorProvider = DefaultDesignSystemColors()
 }
 
 public extension EnvironmentValues {
-    var designSchemeColors: DesignSchemeColors {
-        get { self[DesignSchemeKey.self] }
-        set { self[DesignSchemeKey.self] = newValue }
-    }
-    
     var designSystemColorProvider: DesignSystemColorProvider {
         get { self[ColorProviderKey.self] }
-        set {
-            self[ColorProviderKey.self] = newValue
-            // Automatically update the design scheme colors when provider changes
-            self[DesignSchemeKey.self] = DesignSchemeColors(from: newValue)
-        }
+        set { self[ColorProviderKey.self] = newValue }
+    }
+    
+    var designSchemeColors: DesignSchemeColors {
+        DesignSchemeColors(from: designSystemColorProvider)
     }
 }
 
 // MARK: - View Extensions
 public extension View {
-    func designSchemeColors(_ colors: DesignSchemeColors) -> some View {
-        environment(\.designSchemeColors, colors)
-    }
-    
     func designSystemColorProvider(_ provider: DesignSystemColorProvider) -> some View {
         environment(\.designSystemColorProvider, provider)
     }
@@ -205,7 +192,7 @@ public extension View {
         let accentBackground: Color = .green
     }
     
-    return BaseView {
+     return BaseView {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("DesignSystem Components:")
