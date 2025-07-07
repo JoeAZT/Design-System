@@ -316,7 +316,3 @@ DesignButton(title: "Save")
 - iOS 17.0+
 - Swift 6.1+
 - Xcode 15.0+
-
-## License
-
-This package is available under the MIT license. 
