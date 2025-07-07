@@ -1,14 +1,55 @@
 # DesignSystem
 
-A SwiftUI design system package that provides customizable UI components with support for user-defined color schemes.
+A SwiftUI-first design system library for iOS, providing a set of customizable, theme-aware UI components.
 
 ## Features
+- Consistent color schemes and theming via a color provider protocol
+- App-wide color configuration with environment propagation
+- Ready-to-use, accessible components:
+  - `DesignButton`
+  - `DesignRow`
+  - `DesignTextField`
+  - `DesignCard`
+  - `DesignToggle`
+  - `DesignListItem`
+  - `DesignProgressBar`
+  - `BaseView`
+- Easy integration: just `import DesignSystem` in your app
+- Modern SwiftUI patterns and best practices
 
-- **DesignButton**: Customizable buttons with different color schemes
-- **DesignRow**: Flexible row components with customizable styling
-- **DesignTextField**: Text input fields with customizable styling
-- **BaseView**: Foundation view with background and padding
-- **App-Wide Color Support**: Define your colors once and use them throughout your entire app
+## Usage
+1. Define your color palette by conforming to `DesignSystemColorProvider`.
+2. Set your color provider at the app or root view level using `.designSystemColorProvider(...)`.
+3. Use any DesignSystem component in your views. All components will automatically use your color scheme.
+
+## Example
+```swift
+import DesignSystem
+
+struct MyColors: DesignSystemColorProvider { ... }
+
+@main
+struct MyApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .designSystemColorProvider(MyColors())
+        }
+    }
+}
+```
+
+## Components
+- `DesignButton`
+- `DesignRow`
+- `DesignTextField`
+- `DesignCard`
+- `DesignToggle`
+- `DesignListItem`
+- `DesignProgressBar`
+- `BaseView`
+
+All components are public and available with a single `import DesignSystem`.
 
 ## Installation
 
@@ -251,6 +292,23 @@ DesignProgressBar(
     title: "Loading...",
     scheme: .accent // optional, defaults to .accent
 )
+```
+
+## Accessibility
+
+All DesignSystem components are built with accessibility in mind. To ensure your app is usable by everyone:
+
+- Use clear, descriptive titles and labels for all components.
+- All interactive components (buttons, toggles, list items) are accessible by default.
+- Colors are chosen for sufficient contrast, but always test with your own palette.
+- You can add `.accessibilityLabel`, `.accessibilityHint`, and other SwiftUI accessibility modifiers to any component.
+- Test your app with VoiceOver and Dynamic Type.
+
+**Example:**
+```swift
+DesignButton(title: "Save")
+    .accessibilityLabel("Save changes")
+    .accessibilityHint("Saves your current work")
 ```
 
 ## Requirements

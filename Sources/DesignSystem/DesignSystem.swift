@@ -46,19 +46,29 @@ All components are public and available with a single `import DesignSystem`.
 */
 import SwiftUI
 
-// MARK: - User-Defined Colors Protocol
+/// A protocol for providing color values to the design system.
+///
+/// Conform to this protocol to define your app's color palette. All DesignSystem components will use these colors.
 public protocol DesignSystemColorProvider: Sendable {
+    /// The main background color for your app.
     var backgroundColor: Color { get }
+    /// A variant background color for subtle backgrounds.
     var backgroundVariantColor: Color { get }
+    /// The foreground color for primary elements.
     var primaryForeground: Color { get }
+    /// The background color for primary elements.
     var primaryBackground: Color { get }
+    /// The foreground color for secondary elements.
     var secondaryForeground: Color { get }
+    /// The background color for secondary elements.
     var secondaryBackground: Color { get }
+    /// The foreground color for accent elements.
     var accentForeground: Color { get }
+    /// The background color for accent elements.
     var accentBackground: Color { get }
 }
 
-// MARK: - Default Color Provider
+/// The default color provider used if no custom provider is set.
 public struct DefaultDesignSystemColors: DesignSystemColorProvider {
     public var backgroundColor: Color = .black
     public var backgroundVariantColor: Color = .gray.opacity(0.1)
@@ -72,12 +82,21 @@ public struct DefaultDesignSystemColors: DesignSystemColorProvider {
     public init() {}
 }
 
+/// The available color schemes for the design system.
 public enum DesignScheme {
-    case primary, secondary, accent
+    /// The primary color scheme (default for most components).
+    case primary
+    /// The secondary color scheme (for alternative emphasis).
+    case secondary
+    /// The accent color scheme (for highlights and important actions).
+    case accent
 }
 
+/// A pair of foreground and background colors for a scheme.
 public struct DesignSchemeColorPair: Sendable {
+    /// The foreground color.
     public let foreground: Color
+    /// The background color.
     public let background: Color
     public init(foreground: Color, background: Color) {
         self.foreground = foreground
@@ -85,10 +104,15 @@ public struct DesignSchemeColorPair: Sendable {
     }
 }
 
+/// A collection of color pairs for all supported schemes.
 public struct DesignSchemeColors: Sendable {
+    /// The background color pair.
     public let background: DesignSchemeColorPair
+    /// The primary color pair.
     public let primary: DesignSchemeColorPair
+    /// The secondary color pair.
     public let secondary: DesignSchemeColorPair
+    /// The accent color pair.
     public let accent: DesignSchemeColorPair
     
     public init(
@@ -103,6 +127,7 @@ public struct DesignSchemeColors: Sendable {
         self.accent = accent
     }
     
+    /// Creates a new set of scheme colors from a color provider.
     public init(from provider: DesignSystemColorProvider) {
         self.background = DesignSchemeColorPair(
             foreground: provider.backgroundColor,
@@ -122,6 +147,7 @@ public struct DesignSchemeColors: Sendable {
         )
     }
     
+    /// Returns the color pair for a given scheme.
     public func colors(for scheme: DesignScheme) -> DesignSchemeColorPair {
         switch scheme {
         case .primary: return primary
