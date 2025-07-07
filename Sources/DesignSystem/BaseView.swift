@@ -50,12 +50,13 @@ public struct BaseView<Content: View>: View {
     
     public var body: some View {
         VStack(alignment: alignment) {
-            content
-                .padding(padding)
+            Divider()
+            ScrollView {
+                content
+            }
         }
         .foregroundStyle(schemeColors.primary.foreground)
         .background(background ?? defaultBackground)
-        .ignoresSafeArea()
     }
 }
 

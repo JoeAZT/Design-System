@@ -336,13 +336,15 @@ public extension View {
                     DesignProgressBar(
                         value: 0.6,
                         title: "Secondary Progress",
-                        scheme: .secondary
+                        scheme: .secondary,
+                        fontSize: .large
                     )
                     
                     DesignProgressBar(
                         value: 0.9,
                         title: "Accent Progress",
-                        scheme: .accent
+                        scheme: .accent,
+                        fontSize: .small
                     )
                 }
             }
