@@ -49,10 +49,12 @@ public struct BaseView<Content: View>: View {
     }
     
     public var body: some View {
-        VStack(alignment: alignment) {
+        VStack {
             Divider()
             ScrollView {
-                content
+                VStack(alignment: alignment) {
+                    content
+                }
             }
         }
         .foregroundStyle(schemeColors.primary.foreground)
@@ -62,6 +64,10 @@ public struct BaseView<Content: View>: View {
 
 #Preview {
     BaseView {
+        Text("some preview value here")
+        Text("some preview value here")
+        Text("some preview value here")
+        Text("some preview value here")
         DesignCard {
             Text("Progress")
             DesignProgressBar(value: 0.5)
