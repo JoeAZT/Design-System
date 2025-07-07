@@ -49,22 +49,24 @@ public struct BaseView<Content: View>: View {
     }
     
     public var body: some View {
-        ZStack {
-            Rectangle()
-                .fill(schemeColors.background.background)
-                .ignoresSafeArea()
-            VStack(alignment: alignment) {
-                content
-                    .padding(padding)
-                    .background(background ?? defaultBackground)
-                    .ignoresSafeArea()
-            }
+        VStack(alignment: alignment) {
+            content
+                .padding(padding)
         }
+        .background(background ?? defaultBackground)
+        .ignoresSafeArea()
     }
 }
 
 #Preview {
     BaseView {
-        Text("something here")
+        DesignCard {
+            Text("Progress")
+            DesignProgressBar(value: 0.5)
+        }
+        DesignCard {
+            Text("Progress")
+            DesignProgressBar(value: 0.5)
+        }
     }
 }
