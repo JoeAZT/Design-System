@@ -14,19 +14,34 @@ import SwiftUI
 /// DesignProgressBar(value: 0.5, title: "Uploading...", scheme: .primary)
 /// ```
 public struct DesignProgressBar: View {
+    public enum FontSize {
+        case small, medium, large
+        
+        var font: Font {
+            switch self {
+            case .small: return .caption
+            case .medium: return .body
+            case .large: return .title3
+            }
+        }
+    }
+    
     let value: Double // 0.0 ... 1.0
     let title: String?
     let scheme: DesignScheme
+    let fontSize: FontSize
     @Environment(\.designSchemeColors) private var schemeColors
     
     public init(
         value: Double,
         title: String? = nil,
-        scheme: DesignScheme = .accent
+        scheme: DesignScheme = .accent,
+        fontSize: FontSize = .medium
     ) {
         self.value = value
         self.title = title
         self.scheme = scheme
+        self.fontSize = fontSize
     }
     
     private var colorPair: DesignSchemeColorPair {
@@ -37,7 +52,7 @@ public struct DesignProgressBar: View {
         VStack(alignment: .leading, spacing: 4) {
             if let title = title {
                 Text(title)
-                    .font(.caption)
+                    .font(fontSize.font)
                     .foregroundColor(colorPair.foreground)
             }
             GeometryReader { geometry in

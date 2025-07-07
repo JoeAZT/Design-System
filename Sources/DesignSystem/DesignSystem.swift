@@ -326,23 +326,25 @@ public extension View {
                 Text("DesignProgressBar")
                     .font(.headline)
                 
-                DesignProgressBar(
-                    value: 0.3,
-                    title: "Primary Progress",
-                    scheme: .primary
-                )
-                
-                DesignProgressBar(
-                    value: 0.6,
-                    title: "Secondary Progress",
-                    scheme: .secondary
-                )
-                
-                DesignProgressBar(
-                    value: 0.9,
-                    title: "Accent Progress",
-                    scheme: .accent
-                )
+                DesignCard {
+                    DesignProgressBar(
+                        value: 0.3,
+                        title: "Primary Progress",
+                        scheme: .primary
+                    )
+                    
+                    DesignProgressBar(
+                        value: 0.6,
+                        title: "Secondary Progress",
+                        scheme: .secondary
+                    )
+                    
+                    DesignProgressBar(
+                        value: 0.9,
+                        title: "Accent Progress",
+                        scheme: .accent
+                    )
+                }
             }
             .padding()
         }
