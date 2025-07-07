@@ -181,6 +181,35 @@ public extension View {
 }
 
 #Preview {
+    /**
+     Demonstrates how to use custom colors in previews.
+     
+     Usage:
+     - Define a struct conforming to DesignSystemColorProvider.
+     - Apply .designSystemColorProvider(MyCustomColors()) to your preview root view.
+     - All DesignSystem components in the preview will use your custom colors.
+     
+     Example:
+     ```swift
+     struct MyCustomColors: DesignSystemColorProvider {
+         var backgroundColor: Color = .black
+         var backgroundVariantColor: Color = .green
+         let primaryForeground: Color = .white
+         let primaryBackground: Color = .white.opacity(0.25)
+         let secondaryForeground: Color = .white
+         let secondaryBackground: Color = .white.opacity(0.5)
+         let accentForeground: Color = .white
+         let accentBackground: Color = .green
+     }
+     
+     #Preview {
+         BaseView {
+             // ...
+         }
+         .designSystemColorProvider(MyCustomColors())
+     }
+     ```
+     */
     struct MyCustomColors: DesignSystemColorProvider {
         var backgroundColor: Color = .black
         var backgroundVariantColor: Color = .green
