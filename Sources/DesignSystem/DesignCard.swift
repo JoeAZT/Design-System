@@ -15,15 +15,31 @@ import SwiftUI
 /// }
 /// ```
 public struct DesignCard<Content: View>: View {
+    public enum Spacing {
+        case small, medium, large, extraLarge
+        
+        var value: CGFloat {
+            switch self {
+            case .small: return 8
+            case .medium: return 16
+            case .large: return 24
+            case .extraLarge: return 32
+            }
+        }
+    }
+    
     let scheme: DesignScheme
+    let spacing: Spacing
     let content: Content
     @Environment(\.designSchemeColors) private var schemeColors
     
     public init(
         scheme: DesignScheme = .primary,
+        spacing: Spacing = .medium,
         @ViewBuilder content: () -> Content
     ) {
         self.scheme = scheme
+        self.spacing = spacing
         self.content = content()
     }
     
@@ -32,10 +48,10 @@ public struct DesignCard<Content: View>: View {
     }
     
     public var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: spacing.value) {
             content
         }
-        .padding()
+        .padding(spacing.value)
         .background(colorPair.background)
         .foregroundColor(colorPair.foreground)
         .cornerRadius(16)
