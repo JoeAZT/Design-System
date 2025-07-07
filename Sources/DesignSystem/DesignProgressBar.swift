@@ -58,10 +58,10 @@ public struct DesignProgressBar: View {
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     Capsule()
-                        .frame(height: 8)
+                        .frame(height: 12)
                         .foregroundColor(colorPair.background.opacity(0.2))
                     Capsule()
-                        .frame(width: max(0, min(CGFloat(value), 1.0)) * geometry.size.width, height: 8)
+                        .frame(width: max(0, min(CGFloat(value), 1.0)) * geometry.size.width, height: 12)
                         .foregroundColor(colorPair.background)
                 }
             }
