@@ -60,3 +60,12 @@ public struct DesignButton: View {
         }
     }
 } 
+
+#Preview {
+    BaseView {
+        Text("DesignButtons")
+        DesignButton(title: "Primary Button", action: {})
+        DesignButton(title: "Secondary Button", scheme: .secondary, action: {})
+        DesignButton(title: "Accent Button", scheme: .accent, action: {})
+    }
+}

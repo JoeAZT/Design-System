@@ -74,4 +74,31 @@ public struct DesignRow<Content: View>: View {
             row
         }
     }
-} 
+}
+
+#Preview {
+    BaseView {
+        Text("DesignRow")
+            .font(.headline)
+        DesignRow(
+            title: "Primary Row",
+            action: { print("Tapped!") }
+        ) {
+            Image(systemName: "star")
+        }
+        DesignRow(
+            title: "Secondary Row",
+            scheme: .secondary,
+            action: { print("Tapped!") }
+        ) {
+            Image(systemName: "heart")
+        }
+        DesignRow(
+            title: "Accent Row",
+            scheme: .accent,
+            action: { print("Tapped!") }
+        ) {
+            Image(systemName: "bolt")
+        }
+    }
+}

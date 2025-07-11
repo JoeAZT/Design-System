@@ -67,3 +67,32 @@ public struct DesignCard<Content: View>: View {
         .environment(\.designSystemDefaultChildScheme, scheme.next)
     }
 } 
+
+#Preview {
+    BaseView {
+        Text("Design cards")
+        DesignCard {
+            Text("DesignCard primary")
+        }
+        DesignCard(
+            title: "DesignCard title",
+            scheme: .secondary
+        ) {
+            Text("what?")
+        }
+        DesignCard(
+            title: "DesignCard title",
+            scheme: .accent
+        ) {
+            Text("Design Card content")
+        }
+        DesignCard {
+            Text("DesignCard primary")
+            DesignProgressBar(value: 0.5, scheme: .accent)
+        }
+        DesignCard(scheme: .secondary) {
+            Text("DesignCard primary")
+            DesignProgressBar(value: 0.5, scheme: .accent)
+        }
+    }
+}

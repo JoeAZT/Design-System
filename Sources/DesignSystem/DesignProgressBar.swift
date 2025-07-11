@@ -75,3 +75,24 @@ public struct DesignProgressBar: View {
         .padding(.vertical, 4)
     }
 } 
+
+#Preview {
+    BaseView {
+        DesignProgressBar(
+            value: 0.3,
+            title: "Primary - small title Progress",
+            fontSize: .small
+        )
+        DesignProgressBar(
+            value: 0.3,
+            title: "Secondary - medium title Progress",
+            scheme: .secondary
+        )
+        DesignProgressBar(
+            value: 0.6,
+            title: "Accent - large title Progress",
+            scheme: .accent,
+            fontSize: .large
+        )
+    }
+}

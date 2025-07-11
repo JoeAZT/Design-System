@@ -83,4 +83,30 @@ public struct DesignListItem<Leading: View, Trailing: View>: View {
             row
         }
     }
-} 
+}
+
+#Preview {
+    BaseView {
+        DesignListItem(
+            title: "title",
+            subtitle: "subtitle",
+            scheme: .primary,
+            leading: { Image(systemName: "info.circle")},
+            trailing: { Image(systemName: "chevron.right")}
+        )
+        DesignListItem(
+            title: "title",
+            subtitle: "subtitle",
+            scheme: .primary,
+            leading: { Image(systemName: "info.circle")},
+            trailing: { Image(systemName: "chevron.right")},
+        )
+        DesignListItem(
+            title: "title",
+            subtitle: "subtitle",
+            scheme: .primary,
+            leading: { Image(systemName: "info.circle")},
+            trailing: { Image(systemName: "chevron.right")}
+        )
+    }
+}

@@ -55,3 +55,24 @@ public struct DesignToggle: View {
         .cornerRadius(10)
     }
 } 
+
+#Preview {
+    BaseView {
+        Text("DesignToggle")
+            .font(.headline)
+        DesignToggle(
+            title: "Primary Toggle",
+            isOn: .constant(true)
+        )
+        DesignToggle(
+            title: "Secondary Toggle",
+            isOn: .constant(false),
+            scheme: .secondary
+        )
+        DesignToggle(
+            title: "Accent Toggle",
+            isOn: .constant(true),
+            scheme: .accent
+        )
+    }
+}

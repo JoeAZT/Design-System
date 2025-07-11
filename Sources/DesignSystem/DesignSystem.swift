@@ -311,6 +311,14 @@ public extension View {
                     }
                 }
                 
+                DesignCard(scheme: .secondary) {
+                    VStack(alignment: .leading) {
+                        Text("Primary Card")
+                            .font(.headline)
+                        Text("This is a primary card with some content.")
+                    }
+                }
+                
                 DesignCard(scheme: .accent) {
                     VStack(alignment: .leading) {
                         Text("Accent Card")
