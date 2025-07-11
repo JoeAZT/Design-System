@@ -5,6 +5,7 @@ A SwiftUI-first design system library for iOS, providing a set of customizable, 
 ## Features
 - Consistent color schemes and theming via a color provider protocol
 - App-wide color configuration with environment propagation
+- **Automatic color scheme propagation:** Components nested within a `DesignCard` (or other container) will automatically use the next color scheme in the sequence, making your UI visually distinct and reducing boilerplate. You can still override the color scheme manually if needed.
 - Ready-to-use, accessible components:
   - `DesignButton`
   - `DesignRow`
@@ -316,3 +317,22 @@ DesignButton(title: "Save")
 - iOS 17.0+
 - Swift 6.1+
 - Xcode 15.0+
+
+## Automatic Color Scheme Propagation
+
+One of the key features of this package is automatic color scheme propagation. When you nest a component (such as `DesignButton`, `DesignRow`, `DesignTextField`, `DesignListItem`, or `DesignToggle`) inside a container like `DesignCard`, the child component will automatically use the next color scheme in the sequence (e.g., primary → secondary → primary), making your UI visually distinct without extra code.
+
+You can always override the color scheme by passing the `scheme` parameter explicitly.
+
+**Example:**
+
+```swift
+DesignCard(scheme: .primary) {
+    DesignButton(title: "Action") // uses .secondary by default
+    DesignButton(title: "Primary", scheme: .primary) // uses .primary explicitly
+    DesignRow(title: "Info") { ... } // uses .secondary by default
+    DesignTextField(placeholder: "Email", text: $email) // uses .secondary by default
+}
+```
+
+This approach reduces boilerplate and ensures a consistent, scalable design system for your app.
