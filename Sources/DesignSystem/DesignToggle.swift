@@ -7,22 +7,29 @@ import SwiftUI
 /// - Parameters:
 ///   - title: The label to display next to the toggle.
 ///   - isOn: A binding to the boolean value.
-///   - scheme: The color scheme to use (.primary, .secondary, .accent). Defaults to .primary.
+///   - scheme: The color scheme to use (.primary, .secondary, .accent). If not provided, the toggle will use the propagated scheme from the environment (see below).
+///
+/// ### Color Scheme Propagation
+/// If you nest a `DesignToggle` inside a container (such as `DesignCard`), the toggle will automatically use the next color scheme in the sequence unless you explicitly set the `scheme` parameter. This enables consistent, visually distinct UIs with minimal configuration.
 ///
 /// Example:
 /// ```swift
-/// DesignToggle(title: "Enable notifications", isOn: $enabled)
+/// DesignCard(scheme: .primary) {
+///     DesignToggle(title: "Enable", isOn: $enabled) // uses .secondary by default
+///     DesignToggle(title: "Enable", isOn: $enabled, scheme: .primary) // uses .primary explicitly
+/// }
 /// ```
 public struct DesignToggle: View {
     let title: String
     @Binding var isOn: Bool
-    let scheme: DesignScheme
+    let scheme: DesignScheme?
     @Environment(\.designSchemeColors) private var schemeColors
+    @Environment(\.designSystemDefaultChildScheme) private var defaultChildScheme
     
     public init(
         title: String,
         isOn: Binding<Bool>,
-        scheme: DesignScheme = .primary
+        scheme: DesignScheme? = nil
     ) {
         self.title = title
         self._isOn = isOn
@@ -30,7 +37,11 @@ public struct DesignToggle: View {
     }
     
     private var colorPair: DesignSchemeColorPair {
-        schemeColors.colors(for: scheme)
+        schemeColors.colors(for: resolvedScheme)
+    }
+    
+    private var resolvedScheme: DesignScheme {
+        scheme ?? defaultChildScheme
     }
     
     public var body: some View {

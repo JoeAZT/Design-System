@@ -28,16 +28,20 @@ public struct DesignCard<Content: View>: View {
         }
     }
     
+    let title: String?
     let scheme: DesignScheme
     let spacing: Spacing
     let content: Content
     @Environment(\.designSchemeColors) private var schemeColors
+    @Environment(\.designSystemDefaultChildScheme) private var defaultChildScheme
     
     public init(
+        title: String? = nil,
         scheme: DesignScheme = .primary,
         spacing: Spacing = .medium,
         @ViewBuilder content: () -> Content
     ) {
+        self.title = title
         self.scheme = scheme
         self.spacing = spacing
         self.content = content()
@@ -49,6 +53,10 @@ public struct DesignCard<Content: View>: View {
     
     public var body: some View {
         VStack(alignment: .leading, spacing: spacing.value) {
+            if let title = title {
+                Text(title)
+                    .font(.headline)
+            }
             content
         }
         .padding(spacing.value)
@@ -56,5 +64,6 @@ public struct DesignCard<Content: View>: View {
         .foregroundColor(colorPair.foreground)
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 2)
+        .environment(\.designSystemDefaultChildScheme, scheme.next)
     }
 } 

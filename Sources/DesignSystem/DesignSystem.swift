@@ -1,49 +1,49 @@
 /**
-# DesignSystem
-
-A SwiftUI-first design system library for iOS, providing a set of customizable, theme-aware UI components. 
-
-## Features
-- Consistent color schemes and theming via a color provider protocol
-- App-wide color configuration with environment propagation
-- Ready-to-use, accessible components: Button, Row, Card, Toggle, ListItem, ProgressBar, TextField, and more
-- Easy integration: just `import DesignSystem` in your app
-- Modern SwiftUI patterns and best practices
-
-## Usage
-1. Define your color palette by conforming to `DesignSystemColorProvider`.
-2. Set your color provider at the app or root view level using `.designSystemColorProvider(...)`.
-3. Use any DesignSystem component in your views. All components will automatically use your color scheme.
-
-## Example
-```swift
-import DesignSystem
-
-struct MyColors: DesignSystemColorProvider { ... }
-
-@main
-struct MyApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .designSystemColorProvider(MyColors())
-        }
-    }
-}
-```
-
-## Components
-- `DesignButton`
-- `DesignRow`
-- `DesignTextField`
-- `DesignCard`
-- `DesignToggle`
-- `DesignListItem`
-- `DesignProgressBar`
-- `BaseView`
-
-All components are public and available with a single `import DesignSystem`.
-*/
+ # DesignSystem
+ 
+ A SwiftUI-first design system library for iOS, providing a set of customizable, theme-aware UI components.
+ 
+ ## Features
+ - Consistent color schemes and theming via a color provider protocol
+ - App-wide color configuration with environment propagation
+ - Ready-to-use, accessible components: Button, Row, Card, Toggle, ListItem, ProgressBar, TextField, and more
+ - Easy integration: just `import DesignSystem` in your app
+ - Modern SwiftUI patterns and best practices
+ 
+ ## Usage
+ 1. Define your color palette by conforming to `DesignSystemColorProvider`.
+ 2. Set your color provider at the app or root view level using `.designSystemColorProvider(...)`.
+ 3. Use any DesignSystem component in your views. All components will automatically use your color scheme.
+ 
+ ## Example
+ ```swift
+ import DesignSystem
+ 
+ struct MyColors: DesignSystemColorProvider { ... }
+ 
+ @main
+ struct MyApp: App {
+ var body: some Scene {
+ WindowGroup {
+ ContentView()
+ .designSystemColorProvider(MyColors())
+ }
+ }
+ }
+ ```
+ 
+ ## Components
+ - `DesignButton`
+ - `DesignRow`
+ - `DesignTextField`
+ - `DesignCard`
+ - `DesignToggle`
+ - `DesignListItem`
+ - `DesignProgressBar`
+ - `BaseView`
+ 
+ All components are public and available with a single `import DesignSystem`.
+ */
 import SwiftUI
 
 /// A protocol for providing color values to the design system.
@@ -83,13 +83,22 @@ public struct DefaultDesignSystemColors: DesignSystemColorProvider {
 }
 
 /// The available color schemes for the design system.
-public enum DesignScheme {
+public enum DesignScheme: Sendable {
     /// The primary color scheme (default for most components).
     case primary
     /// The secondary color scheme (for alternative emphasis).
     case secondary
     /// The accent color scheme (for highlights and important actions).
     case accent
+    
+    /// Returns the next scheme in the sequence: primary -> secondary -> primary, accent -> primary
+    public var next: DesignScheme {
+        switch self {
+        case .primary: return .secondary
+        case .secondary: return .primary
+        case .accent: return .primary
+        }
+    }
 }
 
 /// A pair of foreground and background colors for a scheme.
@@ -162,6 +171,10 @@ private struct ColorProviderKey: EnvironmentKey {
     static let defaultValue: DesignSystemColorProvider = DefaultDesignSystemColors()
 }
 
+private struct DefaultChildSchemeKey: EnvironmentKey {
+    static let defaultValue: DesignScheme = .primary
+}
+
 public extension EnvironmentValues {
     var designSystemColorProvider: DesignSystemColorProvider {
         get { self[ColorProviderKey.self] }
@@ -170,6 +183,12 @@ public extension EnvironmentValues {
     
     var designSchemeColors: DesignSchemeColors {
         DesignSchemeColors(from: designSystemColorProvider)
+    }
+    
+    /// The default color scheme for child components, used for automatic scheme propagation.
+    var designSystemDefaultChildScheme: DesignScheme {
+        get { self[DefaultChildSchemeKey.self] }
+        set { self[DefaultChildSchemeKey.self] = newValue }
     }
 }
 
@@ -192,21 +211,21 @@ public extension View {
      Example:
      ```swift
      struct MyCustomColors: DesignSystemColorProvider {
-         var backgroundColor: Color = .black
-         var backgroundVariantColor: Color = .green
-         let primaryForeground: Color = .white
-         let primaryBackground: Color = .white.opacity(0.25)
-         let secondaryForeground: Color = .white
-         let secondaryBackground: Color = .white.opacity(0.5)
-         let accentForeground: Color = .white
-         let accentBackground: Color = .green
+     var backgroundColor: Color = .black
+     var backgroundVariantColor: Color = .green
+     let primaryForeground: Color = .white
+     let primaryBackground: Color = .white.opacity(0.25)
+     let secondaryForeground: Color = .white
+     let secondaryBackground: Color = .white.opacity(0.5)
+     let accentForeground: Color = .white
+     let accentBackground: Color = .green
      }
      
      #Preview {
-         BaseView {
-             // ...
-         }
-         .designSystemColorProvider(MyCustomColors())
+     BaseView {
+     // ...
+     }
+     .designSystemColorProvider(MyCustomColors())
      }
      ```
      */
@@ -214,14 +233,14 @@ public extension View {
         var backgroundColor: Color = .black
         var backgroundVariantColor: Color = .green
         let primaryForeground: Color = .white
-        let primaryBackground: Color = .white.opacity(0.25)
+        let primaryBackground: Color = .red
         let secondaryForeground: Color = .white
-        let secondaryBackground: Color = .white.opacity(0.5)
+        let secondaryBackground: Color = .blue
         let accentForeground: Color = .white
         let accentBackground: Color = .green
     }
     
-     return BaseView {
+    return BaseView {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("DesignSystem Components:")
@@ -355,30 +374,39 @@ public extension View {
                 Text("DesignProgressBar")
                     .font(.headline)
                 
-                DesignCard {
+                DesignCard(title: "Progress bars") {
                     DesignProgressBar(
                         value: 0.3,
-                        title: "Primary Progress",
-                        scheme: .primary
+                        title: "Primary Progress"
                     )
                     
                     DesignProgressBar(
                         value: 0.6,
                         title: "Secondary Progress",
-                        scheme: .secondary,
                         fontSize: .large
                     )
-                    
-                    DesignProgressBar(
-                        value: 0.9,
-                        title: "Accent Progress",
-                        scheme: .accent,
-                        fontSize: .small
-                    )
+                    DesignButton(title: "what colour am I?") {
+                        print("button tapped")
+                    }
+                    DesignCard(scheme: .secondary) {
+                        DesignProgressBar(
+                            value: 0.9,
+                            title: "Accent Progress",
+                            fontSize: .small
+                        )
+                        DesignToggle(title: "toggle title", isOn: .constant(true))
+                        DesignCard(scheme: .accent) {
+                            DesignProgressBar(
+                                value: 0.9,
+                                title: "Accent Progress",
+                                fontSize: .small
+                            )
+                        }
+                    }
                 }
             }
             .padding()
         }
-        .designSystemColorProvider(MyCustomColors()) // Set once, applies to all child views
+        .designSystemColorProvider(MyCustomColors())
     }
 }

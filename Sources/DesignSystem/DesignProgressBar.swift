@@ -28,14 +28,15 @@ public struct DesignProgressBar: View {
     
     let value: Double // 0.0 ... 1.0
     let title: String?
-    let scheme: DesignScheme
+    let scheme: DesignScheme?
     let fontSize: FontSize
     @Environment(\.designSchemeColors) private var schemeColors
+    @Environment(\.designSystemDefaultChildScheme) private var defaultChildScheme
     
     public init(
         value: Double,
         title: String? = nil,
-        scheme: DesignScheme = .accent,
+        scheme: DesignScheme? = nil,
         fontSize: FontSize = .medium
     ) {
         self.value = value
@@ -45,7 +46,11 @@ public struct DesignProgressBar: View {
     }
     
     private var colorPair: DesignSchemeColorPair {
-        schemeColors.colors(for: scheme)
+        schemeColors.colors(for: resolvedScheme)
+    }
+    
+    private var resolvedScheme: DesignScheme {
+        scheme ?? defaultChildScheme
     }
     
     public var body: some View {
@@ -65,7 +70,7 @@ public struct DesignProgressBar: View {
                         .foregroundColor(colorPair.background)
                 }
             }
-            .frame(height: 8)
+            .frame(height: 12)
         }
         .padding(.vertical, 4)
     }

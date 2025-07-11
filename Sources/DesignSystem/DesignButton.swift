@@ -6,22 +6,29 @@ import SwiftUI
 ///
 /// - Parameters:
 ///   - title: The text to display inside the button.
-///   - scheme: The color scheme to use (.primary, .secondary, .accent). Defaults to .primary.
+///   - scheme: The color scheme to use (.primary, .secondary, .accent). If not provided, the button will use the propagated scheme from the environment (see below).
 ///   - action: The action to perform when the button is tapped.
+///
+/// ### Color Scheme Propagation
+/// If you nest a `DesignButton` inside a container (such as `DesignCard`), the button will automatically use the next color scheme in the sequence unless you explicitly set the `scheme` parameter. This enables consistent, visually distinct UIs with minimal configuration.
 ///
 /// Example:
 /// ```swift
-/// DesignButton(title: "Save", scheme: .accent) { ... }
+/// DesignCard(scheme: .primary) {
+///     DesignButton(title: "Action") // uses .secondary by default
+///     DesignButton(title: "Primary", scheme: .primary) // uses .primary explicitly
+/// }
 /// ```
 public struct DesignButton: View {
     let title: String
     let action: (() -> Void)?
-    let scheme: DesignScheme
+    let scheme: DesignScheme?
     @Environment(\.designSchemeColors) private var schemeColors
+    @Environment(\.designSystemDefaultChildScheme) private var defaultChildScheme
     
     public init(
         title: String,
-        scheme: DesignScheme = .primary,
+        scheme: DesignScheme? = nil,
         action: (() -> Void)? = nil
     ) {
         self.title = title
@@ -30,7 +37,11 @@ public struct DesignButton: View {
     }
 
     private var colorPair: DesignSchemeColorPair {
-        schemeColors.colors(for: scheme)
+        schemeColors.colors(for: resolvedScheme)
+    }
+    
+    private var resolvedScheme: DesignScheme {
+        scheme ?? defaultChildScheme
     }
 
     public var body: some View {

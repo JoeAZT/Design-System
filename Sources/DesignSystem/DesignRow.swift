@@ -6,27 +6,31 @@ import SwiftUI
 ///
 /// - Parameters:
 ///   - title: An optional title to display above the row content.
-///   - scheme: The color scheme to use (.primary, .secondary, .accent). Defaults to .primary.
+///   - scheme: The color scheme to use (.primary, .secondary, .accent). If not provided, the row will use the propagated scheme from the environment (see below).
 ///   - action: An optional tap action for the row.
 ///   - content: The custom content to display in the row.
 ///
+/// ### Color Scheme Propagation
+/// If you nest a `DesignRow` inside a container (such as `DesignCard`), the row will automatically use the next color scheme in the sequence unless you explicitly set the `scheme` parameter. This enables consistent, visually distinct UIs with minimal configuration.
+///
 /// Example:
 /// ```swift
-/// DesignRow(title: "Info", scheme: .secondary) {
-///     Image(systemName: "info.circle")
-///     Text("Details")
+/// DesignCard(scheme: .primary) {
+///     DesignRow(title: "Info") { ... } // uses .secondary by default
+///     DesignRow(title: "Primary", scheme: .primary) { ... } // uses .primary explicitly
 /// }
 /// ```
 public struct DesignRow<Content: View>: View {
     let title: String?
-    let scheme: DesignScheme
+    let scheme: DesignScheme?
     let action: (() -> Void)?
     let content: Content
     @Environment(\.designSchemeColors) private var schemeColors
+    @Environment(\.designSystemDefaultChildScheme) private var defaultChildScheme
 
     public init(
         title: String? = nil,
-        scheme: DesignScheme = .primary,
+        scheme: DesignScheme? = nil,
         action: (() -> Void)? = nil,
         @ViewBuilder content: () -> Content
     ) {
@@ -37,7 +41,11 @@ public struct DesignRow<Content: View>: View {
     }
 
     private var colorPair: DesignSchemeColorPair {
-        schemeColors.colors(for: scheme)
+        schemeColors.colors(for: resolvedScheme)
+    }
+    
+    private var resolvedScheme: DesignScheme {
+        scheme ?? defaultChildScheme
     }
 
     public var body: some View {
