@@ -78,7 +78,6 @@ public struct DefaultDesignSystemColors: DesignSystemColorProvider {
     public let secondaryBackground: Color = .blue
     public let accentForeground: Color = .white
     public let accentBackground: Color = .teal
-    
     public init() {}
 }
 
@@ -230,14 +229,14 @@ public extension View {
      ```
      */
     struct MyCustomColors: DesignSystemColorProvider {
-        var backgroundColor: Color = .black
-        var backgroundVariantColor: Color = .green
+        let backgroundColor: Color = .black
+        let backgroundVariantColor: Color = .black.opacity(0.90)
         let primaryForeground: Color = .white
-        let primaryBackground: Color = .red
+        let primaryBackground: Color = .gray
         let secondaryForeground: Color = .white
-        let secondaryBackground: Color = .blue
+        let secondaryBackground: Color = .pink
         let accentForeground: Color = .white
-        let accentBackground: Color = .green
+        let accentBackground: Color = .purple
     }
     
     return BaseView {
@@ -387,7 +386,6 @@ public extension View {
                         value: 0.3,
                         title: "Primary Progress"
                     )
-                    
                     DesignProgressBar(
                         value: 0.6,
                         title: "Secondary Progress",
