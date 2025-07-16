@@ -27,6 +27,8 @@ public struct DesignProgressBar: View {
     }
     
     let value: Double // 0.0 ... 1.0
+    let lowerBound: String?
+    let upperBound: String?
     let title: String?
     let scheme: DesignScheme?
     let fontSize: FontSize
@@ -35,11 +37,15 @@ public struct DesignProgressBar: View {
     
     public init(
         value: Double,
+        lowerBound: String? = nil,
+        upperBound: String? = nil,
         title: String? = nil,
         scheme: DesignScheme? = nil,
         fontSize: FontSize = .medium
     ) {
         self.value = value
+        self.lowerBound = lowerBound
+        self.upperBound = upperBound
         self.title = title
         self.scheme = scheme
         self.fontSize = fontSize
@@ -71,6 +77,17 @@ public struct DesignProgressBar: View {
                 }
             }
             .frame(height: 12)
+            if lowerBound != nil || upperBound != nil {
+                HStack {
+                    if let lower = lowerBound {
+                        Text(lower)
+                    }
+                    Spacer()
+                    if let upper = upperBound {
+                        Text(upper)
+                    }
+                }
+            }
         }
         .padding(.vertical, 4)
     }
