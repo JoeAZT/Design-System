@@ -336,3 +336,206 @@ DesignCard(scheme: .primary) {
 ```
 
 This approach reduces boilerplate and ensures a consistent, scalable design system for your app.
+
+---
+
+## Component Reference
+
+Below are detailed descriptions for each component, including all parameters, types, defaults, and usage examples. This is useful if you want to pass the repo link straight to your AI/LLM in order to create UI for your app using the components available in this package.
+
+### DesignButton
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| title     | String | Yes | – | The text to display inside the button. |
+| scheme    | DesignScheme? | No | Propagated | The color scheme to use (.primary, .secondary, .accent). If not provided, uses the propagated scheme from the environment. |
+| action    | (() -> Void)? | No | nil | The action to perform when the button is tapped. If nil, the button is not tappable. |
+
+**Full Example:**
+```swift
+DesignButton(title: "Primary Button", action: { print("Tapped!") })
+DesignButton(title: "Accent Button", scheme: .accent, action: { print("Accent!") })
+```
+
+**Usage Notes:**
+- Color scheme propagates from parent containers (e.g., DesignCard).
+- Accessible by default; use `.accessibilityLabel` as needed.
+
+---
+
+### DesignRow
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| title     | String? | No | nil | Optional title displayed above the row content. |
+| scheme    | DesignScheme? | No | Propagated | The color scheme to use. |
+| action    | (() -> Void)? | No | nil | Optional tap action for the row. |
+| content   | ViewBuilder | Yes | – | The custom content to display in the row. |
+
+**Full Example:**
+```swift
+DesignRow(title: "My Row", action: { print("Tapped") }) {
+    Image(systemName: "star.fill")
+    Text("Row content")
+}
+```
+
+**Usage Notes:**
+- Color scheme propagates from parent containers.
+- The row is tappable if `action` is provided.
+
+---
+
+### DesignTextField
+
+| Parameter   | Type           | Required | Default     | Description |
+|-------------|----------------|----------|-------------|-------------|
+| placeholder | String         | Yes      | –           | Placeholder text when the field is empty. |
+| text        | Binding<String>| Yes      | –           | The bound text value. |
+| scheme      | DesignScheme?  | No       | Propagated  | The color scheme to use. |
+
+**Full Example:**
+```swift
+@State var name = ""
+DesignTextField(placeholder: "Enter your name", text: $name, scheme: .primary)
+```
+
+**Usage Notes:**
+- Color scheme propagates from parent containers.
+- Accessible by default.
+
+---
+
+### DesignCard
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| title     | String? | No | nil | Optional title displayed at the top of the card. |
+| scheme    | DesignScheme | No | .primary | The color scheme to use for the card. |
+| spacing   | Spacing | No | .medium | The vertical spacing between elements. |
+| content   | ViewBuilder | Yes | – | The content to display inside the card. |
+
+**Full Example:**
+```swift
+DesignCard(title: "Card Title", scheme: .secondary) {
+    Text("Card content")
+    DesignButton(title: "Action")
+}
+```
+
+**Usage Notes:**
+- Sets the default color scheme for child components (propagation). This is the only component that doesnt have colour scheme propogation.
+- Adds padding, background, and shadow.
+
+---
+
+### DesignToggle
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| title     | String | Yes | – | The label to display next to the toggle. |
+| isOn      | Binding<Bool> | Yes | – | The bound boolean value. |
+| scheme    | DesignScheme? | No | Propagated | The color scheme to use. |
+
+**Full Example:**
+```swift
+@State var enabled = false
+DesignToggle(title: "Enable notifications", isOn: $enabled, scheme: .accent)
+```
+
+**Usage Notes:**
+- Color scheme propagates from parent containers.
+- Accessible by default.
+
+---
+
+### DesignListItem
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| title     | String | Yes | – | The main text to display. |
+| subtitle  | String? | No | nil | Optional subtitle below the title. |
+| scheme    | DesignScheme? | No | Propagated | The color scheme to use. |
+| leading   | ViewBuilder | No | EmptyView | Optional leading view (e.g., icon). |
+| trailing  | ViewBuilder | No | EmptyView | Optional trailing view (e.g., detail text). |
+| action    | (() -> Void)? | No | nil | Optional tap action for the row. |
+
+**Full Example:**
+```swift
+DesignListItem(
+    title: "List Item",
+    subtitle: "Optional subtitle",
+    scheme: .primary,
+    leading: { Image(systemName: "star.fill") },
+    trailing: { Text("Detail") },
+    action: { print("Tapped!") }
+)
+```
+
+**Usage Notes:**
+- Color scheme propagates from parent containers.
+- Tappable if `action` is provided.
+- Use both `leading` and `trailing` for full-featured list items.
+
+---
+
+### DesignProgressBar
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| value     | Double | Yes | – | The progress value (0.0 to 1.0). |
+| title     | String? | No | nil | Optional label above the bar. |
+| scheme    | DesignScheme? | No | Propagated | The color scheme to use. |
+| fontSize  | FontSize | No | .medium | The font size for the title. |
+
+**Full Example:**
+```swift
+DesignProgressBar(value: 0.7, title: "Loading...", scheme: .accent, fontSize: .large)
+```
+
+**Usage Notes:**
+- Color scheme propagates from parent containers.
+- Use `fontSize` to adjust the title size.
+
+---
+
+### BaseView
+
+| Parameter   | Type             | Required | Default   | Description |
+|-------------|------------------|----------|-----------|-------------|
+| background  | LinearGradient?  | No       | nil       | Optional background gradient. If nil, uses the default. |
+| padding     | CGFloat          | No       | 16        | Padding for the content. |
+| alignment   | HorizontalAlignment | No    | .leading  | Alignment for the content. |
+| content     | ViewBuilder      | Yes      | –         | The content to display inside the view. |
+
+**Full Example:**
+```swift
+BaseView(background: MyColors().createBackgroundGradient(), padding: 24, alignment: .center) {
+    Text("Hello World")
+    DesignCard {
+        Text("Inside a card!")
+    }
+}
+```
+
+**Usage Notes:**
+- Use as the root container for screens.
+- Supports custom backgrounds and safe area handling.
+
+---
+
+## Color Scheme Propagation
+
+All components (except BaseView) support automatic color scheme propagation. When you nest a component inside a container like `DesignCard`, the child will use the next color scheme in the sequence unless you explicitly set the `scheme` parameter.
+
+**Example:**
+```swift
+DesignCard(scheme: .primary) {
+    DesignButton(title: "Action") // uses .secondary by default
+    DesignListItem(title: "Info") // uses .secondary by default
+}
+```
+
+## Accessibility
+
+All components are built with accessibility in mind. Use `.accessibilityLabel`, `.accessibilityHint`, and other SwiftUI accessibility modifiers as needed.
