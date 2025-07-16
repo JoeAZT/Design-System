@@ -485,17 +485,27 @@ DesignListItem(
 |-----------|------|----------|---------|-------------|
 | value     | Double | Yes | – | The progress value (0.0 to 1.0). |
 | title     | String? | No | nil | Optional label above the bar. |
+| lowerBound| String? | No | nil | Optional label shown at the start (left) of the progress bar. |
+| upperBound| String? | No | nil | Optional label shown at the end (right) of the progress bar. |
 | scheme    | DesignScheme? | No | Propagated | The color scheme to use. |
 | fontSize  | FontSize | No | .medium | The font size for the title. |
 
 **Full Example:**
 ```swift
-DesignProgressBar(value: 0.7, title: "Loading...", scheme: .accent, fontSize: .large)
+DesignProgressBar(
+    value: 0.7,
+    title: "Loading...",
+    lowerBound: "0%",
+    upperBound: "100%",
+    scheme: .accent,
+    fontSize: .large
+)
 ```
 
 **Usage Notes:**
 - Color scheme propagates from parent containers.
 - Use `fontSize` to adjust the title size.
+- The lower and upper bounds are only shown if provided.
 
 ---
 
