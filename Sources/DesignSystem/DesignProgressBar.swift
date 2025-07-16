@@ -32,20 +32,20 @@ public struct DesignProgressBar: View {
         var value: CGFloat {
             switch self {
             case .small: return 12
-            case .medium: return 16
+            case .medium: return 18
             case .large: return 24
             }
         }
     }
     
+    let title: String?
+    let fontSize: FontSize
+    let spacing: CGFloat
+    let scheme: DesignScheme?
     let value: Double // 0.0 ... 1.0
     let lowerBound: String?
     let upperBound: String?
-    let title: String?
-    let scheme: DesignScheme?
-    let fontSize: FontSize
-    let spacing: CGFloat
-    let height: Height
+    let progressBarHeight: Height
     @Environment(\.designSchemeColors) private var schemeColors
     @Environment(\.designSystemDefaultChildScheme) private var defaultChildScheme
     
@@ -66,7 +66,7 @@ public struct DesignProgressBar: View {
         self.scheme = scheme
         self.fontSize = fontSize
         self.spacing = spacing
-        self.height = height
+        self.progressBarHeight = height
     }
     
     private var colorPair: DesignSchemeColorPair {
@@ -87,14 +87,14 @@ public struct DesignProgressBar: View {
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     Capsule()
-                        .frame(height: height.value)
+                        .frame(height: progressBarHeight.value)
                         .foregroundColor(colorPair.background.opacity(0.2))
                     Capsule()
-                        .frame(width: max(0, min(CGFloat(value), 1.0)) * geometry.size.width, height: height.value)
+                        .frame(width: max(0.0325, min(CGFloat(value), 1.0)) * geometry.size.width, height: progressBarHeight.value)
                         .foregroundColor(colorPair.background)
                 }
             }
-            .frame(height: height.value)
+            .frame(height: progressBarHeight.value)
             if lowerBound != nil || upperBound != nil {
                 HStack {
                     if let lower = lowerBound {
@@ -114,7 +114,7 @@ public struct DesignProgressBar: View {
 #Preview {
     BaseView {
         DesignProgressBar(
-            value: 0.3,
+            value: 0.0,
             title: "Primary - small title Progress",
             fontSize: .small,
             height: .small
