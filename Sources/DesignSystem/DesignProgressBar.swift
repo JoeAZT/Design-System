@@ -25,6 +25,18 @@ public struct DesignProgressBar: View {
             }
         }
     }
+
+    public enum Height {
+        case small, medium, large
+
+        var value: CGFloat {
+            switch self {
+            case .small: return 12
+            case .medium: return 16
+            case .large: return 24
+            }
+        }
+    }
     
     let value: Double // 0.0 ... 1.0
     let lowerBound: String?
@@ -32,6 +44,8 @@ public struct DesignProgressBar: View {
     let title: String?
     let scheme: DesignScheme?
     let fontSize: FontSize
+    let spacing: CGFloat
+    let height: Height
     @Environment(\.designSchemeColors) private var schemeColors
     @Environment(\.designSystemDefaultChildScheme) private var defaultChildScheme
     
@@ -41,7 +55,9 @@ public struct DesignProgressBar: View {
         upperBound: String? = nil,
         title: String? = nil,
         scheme: DesignScheme? = nil,
-        fontSize: FontSize = .medium
+        fontSize: FontSize = .medium,
+        spacing: CGFloat = 8,
+        height: Height = .medium
     ) {
         self.value = value
         self.lowerBound = lowerBound
@@ -49,6 +65,8 @@ public struct DesignProgressBar: View {
         self.title = title
         self.scheme = scheme
         self.fontSize = fontSize
+        self.spacing = spacing
+        self.height = height
     }
     
     private var colorPair: DesignSchemeColorPair {
@@ -60,7 +78,7 @@ public struct DesignProgressBar: View {
     }
     
     public var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: spacing) {
             if let title = title {
                 Text(title)
                     .font(fontSize.font)
@@ -69,14 +87,14 @@ public struct DesignProgressBar: View {
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     Capsule()
-                        .frame(height: 12)
+                        .frame(height: height.value)
                         .foregroundColor(colorPair.background.opacity(0.2))
                     Capsule()
-                        .frame(width: max(0, min(CGFloat(value), 1.0)) * geometry.size.width, height: 12)
+                        .frame(width: max(0, min(CGFloat(value), 1.0)) * geometry.size.width, height: height.value)
                         .foregroundColor(colorPair.background)
                 }
             }
-            .frame(height: 12)
+            .frame(height: height.value)
             if lowerBound != nil || upperBound != nil {
                 HStack {
                     if let lower = lowerBound {
@@ -89,7 +107,7 @@ public struct DesignProgressBar: View {
                 }
             }
         }
-        .padding(.vertical, 4)
+        .padding(spacing / 2)
     }
 } 
 
@@ -98,7 +116,8 @@ public struct DesignProgressBar: View {
         DesignProgressBar(
             value: 0.3,
             title: "Primary - small title Progress",
-            fontSize: .small
+            fontSize: .small,
+            height: .small
         )
         DesignProgressBar(
             value: 0.3,
@@ -109,7 +128,22 @@ public struct DesignProgressBar: View {
             value: 0.6,
             title: "Accent - large title Progress",
             scheme: .accent,
-            fontSize: .large
+            fontSize: .large,
+            height: .large
         )
+        DesignCard {
+            DesignProgressBar(
+                value: 0.6,
+                title: "Accent - large title Progress",
+                fontSize: .large
+            )
+        }
+        DesignCard(scheme: .secondary) {
+            DesignProgressBar(
+                value: 0.6,
+                title: "Accent - large title Progress",
+                fontSize: .large
+            )
+        }
     }
 }

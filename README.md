@@ -489,6 +489,8 @@ DesignListItem(
 | upperBound| String? | No | nil | Optional label shown at the end (right) of the progress bar. |
 | scheme    | DesignScheme? | No | Propagated | The color scheme to use. |
 | fontSize  | FontSize | No | .medium | The font size for the title. |
+| spacing   | CGFloat | No | 8 | The vertical spacing and padding between elements. |
+| height    | Height | No | .medium | The height of the progress bar capsules. |
 
 **Full Example:**
 ```swift
@@ -498,7 +500,9 @@ DesignProgressBar(
     lowerBound: "0%",
     upperBound: "100%",
     scheme: .accent,
-    fontSize: .large
+    fontSize: .large,
+    spacing: 16,
+    height: .large
 )
 ```
 
