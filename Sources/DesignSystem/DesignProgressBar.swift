@@ -133,7 +133,7 @@ public struct DesignProgressBar: View {
         )
         DesignCard {
             DesignProgressBar(
-                value: 0.6,
+                value: 0.0,
                 title: "Accent - large title Progress",
                 fontSize: .large
             )
@@ -141,6 +141,8 @@ public struct DesignProgressBar: View {
         DesignCard(scheme: .secondary) {
             DesignProgressBar(
                 value: 0.6,
+                lowerBound: "100",
+                upperBound: "1000",
                 title: "Accent - large title Progress",
                 fontSize: .large
             )
