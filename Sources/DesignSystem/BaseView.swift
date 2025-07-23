@@ -20,17 +20,20 @@ public struct BaseView<Content: View>: View {
     let padding: CGFloat
     let content: Content
     let alignment: HorizontalAlignment
+    let navigationTitle: String?
     @Environment(\.designSchemeColors) private var schemeColors
     
     public init(
         background: LinearGradient? = nil,
         padding: CGFloat = 16,
         alignment: HorizontalAlignment = .leading,
+        navigationTitle: String? = nil,
         @ViewBuilder content: () -> Content
     ) {
         self.background = background
         self.padding = padding
         self.alignment = alignment
+        self.navigationTitle = navigationTitle
         self.content = content()
     }
     
@@ -49,25 +52,48 @@ public struct BaseView<Content: View>: View {
     }
     
     public var body: some View {
-        VStack {
-            Divider()
+        NavigationStack {
             ScrollView {
                 VStack(alignment: alignment) {
                     content
                 }
             }
+            .foregroundStyle(schemeColors.primary.foreground)
+            .background(background ?? defaultBackground)
         }
-        .foregroundStyle(schemeColors.primary.foreground)
-        .background(background ?? defaultBackground)
     }
 }
 
 #Preview {
-    BaseView {
+    BaseView(navigationTitle: "Base view title") {
         Text("some preview value here")
         Text("some preview value here")
         Text("some preview value here")
         Text("some preview value here")
+        DesignCard {
+            Text("Progress")
+            DesignProgressBar(value: 0.5)
+        }
+        DesignCard {
+            Text("Progress")
+            DesignProgressBar(value: 0.5)
+        }
+        DesignCard {
+            Text("Progress")
+            DesignProgressBar(value: 0.5)
+        }
+        DesignCard {
+            Text("Progress")
+            DesignProgressBar(value: 0.5)
+        }
+        DesignCard {
+            Text("Progress")
+            DesignProgressBar(value: 0.5)
+        }
+        DesignCard {
+            Text("Progress")
+            DesignProgressBar(value: 0.5)
+        }
         DesignCard {
             Text("Progress")
             DesignProgressBar(value: 0.5)
