@@ -59,6 +59,7 @@ public struct DesignCard<Content: View>: View {
             }
             content
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(spacing.value)
         .background(colorPair.background)
         .foregroundColor(colorPair.foreground)
