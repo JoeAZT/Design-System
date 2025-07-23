@@ -86,7 +86,8 @@ public struct DesignCard<Content: View>: View {
         }
         DesignCard(
             title: "DesignCard title",
-            scheme: .accent
+            scheme: .accent,
+            spacing: .small
         ) {
             Text("Design Card content")
         }
