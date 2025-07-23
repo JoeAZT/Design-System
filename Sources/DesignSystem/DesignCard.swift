@@ -32,6 +32,7 @@ public struct DesignCard<Content: View>: View {
     let scheme: DesignScheme
     let spacing: Spacing
     let content: Content
+    let alignment: Alignment
     @Environment(\.designSchemeColors) private var schemeColors
     @Environment(\.designSystemDefaultChildScheme) private var defaultChildScheme
     
@@ -39,11 +40,13 @@ public struct DesignCard<Content: View>: View {
         title: String? = nil,
         scheme: DesignScheme = .primary,
         spacing: Spacing = .medium,
+        alignment: Alignment = .leading,
         @ViewBuilder content: () -> Content
     ) {
         self.title = title
         self.scheme = scheme
         self.spacing = spacing
+        self.alignment = alignment
         self.content = content()
     }
     
@@ -59,7 +62,7 @@ public struct DesignCard<Content: View>: View {
             }
             content
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: alignment)
         .padding(spacing.value)
         .background(colorPair.background)
         .foregroundColor(colorPair.foreground)
