@@ -40,11 +40,11 @@ public struct BaseView<Content: View>: View {
     private var defaultBackground: LinearGradient {
         LinearGradient(
             colors: [
+                schemeColors.background.foreground,
                 schemeColors.background.background,
                 schemeColors.background.background,
                 schemeColors.background.background,
                 schemeColors.background.background,
-                schemeColors.background.foreground
             ],
             startPoint: .bottomLeading,
             endPoint: .topTrailing

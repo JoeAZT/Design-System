@@ -83,6 +83,8 @@ public struct DefaultDesignSystemColors: DesignSystemColorProvider {
 
 /// The available color schemes for the design system.
 public enum DesignScheme: Sendable {
+    /// The background color scheme (default for BaseView).
+    case background
     /// The primary color scheme (default for most components).
     case primary
     /// The secondary color scheme (for alternative emphasis).
@@ -93,6 +95,7 @@ public enum DesignScheme: Sendable {
     /// Returns the next scheme in the sequence: primary -> secondary -> primary, accent -> primary
     public var next: DesignScheme {
         switch self {
+        case .background: return .background
         case .primary: return .secondary
         case .secondary: return .primary
         case .accent: return .primary
@@ -124,10 +127,22 @@ public struct DesignSchemeColors: Sendable {
     public let accent: DesignSchemeColorPair
     
     public init(
-        background: DesignSchemeColorPair = .init(foreground: .white, background: .black),
-        primary: DesignSchemeColorPair = .init(foreground: .white, background: .black),
-        secondary: DesignSchemeColorPair = .init(foreground: .white, background: .red),
-        accent: DesignSchemeColorPair = .init(foreground: .white, background: .green)
+        background: DesignSchemeColorPair = .init(
+            foreground: .white,
+            background: .black
+        ),
+        primary: DesignSchemeColorPair = .init(
+            foreground: .white,
+            background: .black
+        ),
+        secondary: DesignSchemeColorPair = .init(
+            foreground: .white,
+            background: .red
+        ),
+        accent: DesignSchemeColorPair = .init(
+            foreground: .white,
+            background: .green
+        )
     ) {
         self.background = background
         self.primary = primary
@@ -158,6 +173,7 @@ public struct DesignSchemeColors: Sendable {
     /// Returns the color pair for a given scheme.
     public func colors(for scheme: DesignScheme) -> DesignSchemeColorPair {
         switch scheme {
+        case .background: return background
         case .primary: return primary
         case .secondary: return secondary
         case .accent: return accent
