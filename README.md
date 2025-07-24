@@ -553,3 +553,27 @@ DesignCard(scheme: .primary) {
 ## Accessibility
 
 All components are built with accessibility in mind. Use `.accessibilityLabel`, `.accessibilityHint`, and other SwiftUI accessibility modifiers as needed.
+
+---
+
+## Accessing Design System Colors in Your Own Components
+
+You can use the current design system colors in your own views and custom components:
+
+```swift
+import DesignSystem
+
+struct MyCustomView: View {
+    @DesignSystemColors var colors
+
+    var body: some View {
+        Rectangle()
+            .fill(colors.primaryBackground)
+        // Use any color from your DesignSystemColorProvider
+    }
+}
+```
+
+This ensures your custom components always match your app’s theme and color scheme.
+
+---
