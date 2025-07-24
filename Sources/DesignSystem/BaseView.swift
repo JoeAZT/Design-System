@@ -41,10 +41,12 @@ public struct BaseView<Content: View>: View {
         LinearGradient(
             colors: [
                 schemeColors.background.foreground,
-                schemeColors.background.background,
-                schemeColors.background.background,
-                schemeColors.background.background,
-                schemeColors.background.background,
+                schemeColors.background.foreground,
+                schemeColors.background.foreground,
+                schemeColors.background.foreground,
+                schemeColors.background.foreground,
+                schemeColors.background.foreground,
+                schemeColors.background.background
             ],
             startPoint: .bottomLeading,
             endPoint: .topTrailing
@@ -66,38 +68,6 @@ public struct BaseView<Content: View>: View {
 
 #Preview {
     BaseView(navigationTitle: "Base view title") {
-        Text("some preview value here")
-        Text("some preview value here")
-        Text("some preview value here")
-        Text("some preview value here")
-        DesignCard {
-            Text("Progress")
-            DesignProgressBar(value: 0.5)
-        }
-        DesignCard {
-            Text("Progress")
-            DesignProgressBar(value: 0.5)
-        }
-        DesignCard {
-            Text("Progress")
-            DesignProgressBar(value: 0.5)
-        }
-        DesignCard {
-            Text("Progress")
-            DesignProgressBar(value: 0.5)
-        }
-        DesignCard {
-            Text("Progress")
-            DesignProgressBar(value: 0.5)
-        }
-        DesignCard {
-            Text("Progress")
-            DesignProgressBar(value: 0.5)
-        }
-        DesignCard {
-            Text("Progress")
-            DesignProgressBar(value: 0.5)
-        }
         DesignCard {
             Text("Progress")
             DesignProgressBar(value: 0.5)
