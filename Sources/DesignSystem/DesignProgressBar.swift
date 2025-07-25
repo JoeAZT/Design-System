@@ -46,6 +46,7 @@ public struct DesignProgressBar: View {
     let lowerBound: String?
     let upperBound: String?
     let progressBarHeight: Height
+    let titleWeight: Font.Weight
     @Environment(\.designSchemeColors) private var schemeColors
     @Environment(\.designSystemDefaultChildScheme) private var defaultChildScheme
     
@@ -57,7 +58,8 @@ public struct DesignProgressBar: View {
         scheme: DesignScheme? = nil,
         fontSize: FontSize = .medium,
         spacing: CGFloat = 8,
-        height: Height = .medium
+        height: Height = .medium,
+        titleWeight: Font.Weight = .medium
     ) {
         self.value = value
         self.lowerBound = lowerBound
@@ -67,6 +69,7 @@ public struct DesignProgressBar: View {
         self.fontSize = fontSize
         self.spacing = spacing
         self.progressBarHeight = height
+        self.titleWeight = titleWeight
     }
     
     private var colorPair: DesignSchemeColorPair {
@@ -82,6 +85,7 @@ public struct DesignProgressBar: View {
             if let title = title {
                 Text(title)
                     .font(fontSize.font)
+                    .fontWeight(titleWeight)
                     .foregroundColor(colorPair.foreground)
             }
             GeometryReader { geometry in
@@ -115,6 +119,10 @@ public struct DesignProgressBar: View {
     BaseView {
         DesignProgressBar(
             value: 0.0,
+            title: "Primary - small title Progress"
+        )
+        DesignProgressBar(
+            value: 0.0,
             title: "Primary - small title Progress",
             fontSize: .small,
             height: .small
@@ -135,7 +143,8 @@ public struct DesignProgressBar: View {
             DesignProgressBar(
                 value: 0.0,
                 title: "Accent - large title Progress",
-                fontSize: .large
+                fontSize: .large,
+                titleWeight: .bold
             )
         }
         DesignCard(scheme: .secondary) {
@@ -147,5 +156,10 @@ public struct DesignProgressBar: View {
                 fontSize: .large
             )
         }
+        DesignProgressBar(
+            value: 0.3,
+            title: "Secondary - medium title Progress",
+            titleWeight: .bold
+        )
     }
 }
