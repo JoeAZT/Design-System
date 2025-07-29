@@ -491,6 +491,9 @@ DesignListItem(
 | fontSize  | FontSize | No | .medium | The font size for the title. |
 | spacing   | CGFloat | No | 8 | The vertical spacing and padding between elements. |
 | height    | Height | No | .medium | The height of the progress bar capsules. |
+| titleColor| Color? | No | nil | Custom color for the title. Defaults to scheme foreground. |
+| textColor | Color? | No | nil | Custom color for lower/upper bound text. Defaults to scheme foreground. |
+| componentColor| Color? | No | nil | Custom color for the progress bar capsules. Defaults to scheme background. |
 
 **Full Example:**
 ```swift
@@ -502,7 +505,10 @@ DesignProgressBar(
     scheme: .accent,
     fontSize: .large,
     spacing: 16,
-    height: .large
+    height: .large,
+    titleColor: .yellow,
+    textColor: .white,
+    componentColor: .orange
 )
 ```
 
@@ -510,6 +516,8 @@ DesignProgressBar(
 - Color scheme propagates from parent containers.
 - Use `fontSize` to adjust the title size.
 - The lower and upper bounds are only shown if provided.
+- Custom colors override the scheme colors for this specific component.
+- If custom colors are not provided, the component uses the scheme colors.
 
 ---
 

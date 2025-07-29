@@ -47,6 +47,9 @@ public struct DesignProgressBar: View {
     let upperBound: String?
     let progressBarHeight: Height
     let titleWeight: Font.Weight
+    let titleColor: Color?
+    let textColor: Color?
+    let componentColor: Color?
     @Environment(\.designSchemeColors) private var schemeColors
     @Environment(\.designSystemDefaultChildScheme) private var defaultChildScheme
     
@@ -59,7 +62,10 @@ public struct DesignProgressBar: View {
         fontSize: FontSize = .medium,
         spacing: CGFloat = 8,
         height: Height = .medium,
-        titleWeight: Font.Weight = .medium
+        titleWeight: Font.Weight = .medium,
+        titleColor: Color? = nil,
+        textColor: Color? = nil,
+        componentColor: Color? = nil
     ) {
         self.value = value
         self.lowerBound = lowerBound
@@ -70,6 +76,9 @@ public struct DesignProgressBar: View {
         self.spacing = spacing
         self.progressBarHeight = height
         self.titleWeight = titleWeight
+        self.titleColor = titleColor
+        self.textColor = textColor
+        self.componentColor = componentColor
     }
     
     private var colorPair: DesignSchemeColorPair {
@@ -80,22 +89,34 @@ public struct DesignProgressBar: View {
         scheme ?? defaultChildScheme
     }
     
+    private var resolvedTitleColor: Color {
+        titleColor ?? colorPair.foreground
+    }
+    
+    private var resolvedTextColor: Color {
+        textColor ?? colorPair.foreground
+    }
+    
+    private var resolvedComponentColor: Color {
+        componentColor ?? colorPair.background
+    }
+    
     public var body: some View {
         VStack(alignment: .leading, spacing: spacing) {
             if let title = title {
                 Text(title)
                     .font(fontSize.font)
                     .fontWeight(titleWeight)
-                    .foregroundColor(colorPair.foreground)
+                    .foregroundColor(resolvedTitleColor)
             }
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     Capsule()
                         .frame(height: progressBarHeight.value)
-                        .foregroundColor(colorPair.background.opacity(0.2))
+                        .foregroundColor(resolvedComponentColor.opacity(0.3))
                     Capsule()
-                        .frame(width: max(0.0325, min(CGFloat(value), 1.0)) * geometry.size.width, height: progressBarHeight.value)
-                        .foregroundColor(colorPair.background)
+                        .frame(width: max(0.035, min(CGFloat(value), 1.0)) * geometry.size.width, height: progressBarHeight.value)
+                        .foregroundColor(resolvedComponentColor)
                 }
             }
             .frame(height: progressBarHeight.value)
@@ -103,15 +124,17 @@ public struct DesignProgressBar: View {
                 HStack {
                     if let lower = lowerBound {
                         Text(lower)
+                            .foregroundColor(resolvedTextColor)
                     }
                     Spacer()
                     if let upper = upperBound {
                         Text(upper)
+                            .foregroundColor(resolvedTextColor)
                     }
                 }
             }
         }
-        .padding(spacing / 2)
+        .padding(.vertical, spacing)
     }
 } 
 
@@ -161,5 +184,23 @@ public struct DesignProgressBar: View {
             title: "Secondary - medium title Progress",
             titleWeight: .bold
         )
+        DesignProgressBar(
+            value: 0.3,
+            title: "Secondary - medium title Progress",
+            titleWeight: .bold,
+            titleColor: .red
+        )
+        DesignCard(scheme: .secondary) {
+            DesignProgressBar(
+                value: 0.6,
+                lowerBound: "100",
+                upperBound: "1000",
+                title: "Coloration using individual color",
+                fontSize: .large,
+                titleColor: .black,
+                textColor: .black,
+                componentColor: .red
+            )
+        }
     }
 }
