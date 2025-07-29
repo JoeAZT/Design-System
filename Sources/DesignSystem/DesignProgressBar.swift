@@ -27,10 +27,11 @@ public struct DesignProgressBar: View {
     }
 
     public enum Height {
-        case small, medium, large
+        case xsmall, small, medium, large
 
         var value: CGFloat {
             switch self {
+            case .xsmall: return 6
             case .small: return 12
             case .medium: return 18
             case .large: return 24
@@ -143,6 +144,12 @@ public struct DesignProgressBar: View {
         DesignProgressBar(
             value: 0.0,
             title: "Primary - small title Progress"
+        )
+        DesignProgressBar(
+            value: 0.0,
+            title: "Primary - small title Progress",
+            fontSize: .small,
+            height: .xsmall
         )
         DesignProgressBar(
             value: 0.0,
