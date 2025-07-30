@@ -43,29 +43,32 @@ public struct DesignButton: View {
     private var resolvedScheme: DesignScheme {
         scheme ?? defaultChildScheme
     }
+    
+    private var isEnabled: Bool {
+        action != nil
+    }
 
     public var body: some View {
-        let button = Text(title)
-            .font(.headline)
-            .foregroundColor(colorPair.foreground)
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(colorPair.background)
-            .cornerRadius(10)
-        if let action = action {
-            Button(action: action) { button }
-                .buttonStyle(PlainButtonStyle())
-        } else {
-            button
+        Button(action: action ?? {}) {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(colorPair.foreground)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(colorPair.background)
+                .cornerRadius(10)
         }
+        .buttonStyle(PlainButtonStyle())
+        .allowsHitTesting(isEnabled)
     }
-} 
+}
 
 #Preview {
     BaseView {
         Text("DesignButtons")
-        DesignButton(title: "Primary Button", action: {})
-        DesignButton(title: "Secondary Button", scheme: .secondary, action: {})
+        DesignButton(title: "Primary Button", action: { print("Primary button")})
+        DesignButton(title: "Secondary Button", scheme: .secondary, action: { print("Secondary button") })
         DesignButton(title: "Accent Button", scheme: .accent, action: {})
+        DesignButton(title: "Disabled Button")
     }
 }
