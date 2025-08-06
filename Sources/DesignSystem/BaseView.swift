@@ -1,19 +1,44 @@
 import SwiftUI
 
-/// A foundation view that provides background color/gradient and padding for your app's content.
+/// A foundational container view that provides consistent background styling, padding,
+/// and structured layout for your screen content.
 ///
-/// Use `BaseView` as the root container for your screens. It supports custom backgrounds and safe area handling, and works seamlessly with your design system's color provider.
+/// `BaseView` is intended as the root view for your app's screens. It includes:
+/// - A customizable background (gradient or fallback)
+/// - Layout padding and alignment
+/// - A scrollable main content area
+/// - Optional `bottomContent` that is pinned to the bottom of the screen
+///
+/// `bottomContent` will remain fixed to the bottom of the screen when the content does not fill the available space,
+/// and will scroll off-screen if the main content exceeds the screen height (WIP).
 ///
 /// - Parameters:
-///   - background: An optional background gradient. If not provided, a default is used.
-///   - padding: The padding to apply to the content. Defaults to 16.
-///   - content: The content to display inside the view.
-///   - bottomContent: Optional value for the content you may want pinned to the bottom of the view. This content will sit under the scrollable content within the view, or if there is not sufficient content to fill the view it will be pinned to the bottom.
+///   - background: An optional background gradient. If not provided, a default is used from the design scheme.
+///   - padding: The padding applied around the main content. Defaults to 16.
+///   - alignment: The horizontal alignment of the content. Defaults to `.leading`.
+///   - navigationTitle: An optional navigation title to show in the navigation bar.
+///   - bottomContent: An optional trailing view that is pinned to the bottom of the screen. It remains visible below the scroll view unless content overflows.
+///   - content: The main body content of the screen.
 ///
-/// Example:
+/// Example (basic):
 /// ```swift
-/// BaseView(background: MyColors().createBackgroundGradient()) {
-///     // Your content here
+/// BaseView {
+///     DesignTextField(placeholder: "Name", text: $name)
+/// }
+/// ```
+///
+/// Example (with pinned button):
+/// ```swift
+/// BaseView(
+///     navigationTitle: "Create Quest",
+///     bottomContent: {
+///         DesignButton(title: "Save") { viewModel.save() }
+///     }
+/// ) {
+///     DesignCard {
+///         Text("Add a new quest")
+///         DesignTextField(placeholder: "Title", text: $title)
+///     }
 /// }
 /// ```
 public struct BaseView<Content: View, BottomContent: View>: View {
