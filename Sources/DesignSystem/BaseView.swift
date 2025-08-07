@@ -108,11 +108,10 @@ public struct BaseView<Content: View, BottomContent: View>: View {
             }
         }
     ) {
-        VStack(spacing: 24) {
+        VStack(spacing: 8) {
             DesignCard {
                 Text("Add your new quest")
             }
-
             DesignTextField(
                 placeholder: "Enter quest name",
                 text: .constant("Read 5 pages")
