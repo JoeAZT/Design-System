@@ -48,25 +48,25 @@ public struct BaseView<Content: View, BottomContent: View>: View {
     let alignment: HorizontalAlignment
     let navigationTitle: String?
     let bottomContent: BottomContent
-
+    
     @Environment(\.designSchemeColors) private var schemeColors
-
+    
     public init(
+        navigationTitle: String? = nil,
+        @ViewBuilder content: () -> Content,
+        @ViewBuilder bottomContent: () -> BottomContent = { EmptyView() },
+        alignment: HorizontalAlignment = .leading,
         background: LinearGradient? = nil,
         padding: CGFloat = 16,
-        alignment: HorizontalAlignment = .leading,
-        navigationTitle: String? = nil,
-        @ViewBuilder bottomContent: () -> BottomContent = { EmptyView() },
-        @ViewBuilder content: () -> Content
     ) {
         self.background = background
         self.padding = padding
         self.alignment = alignment
         self.navigationTitle = navigationTitle
-        self.bottomContent = bottomContent()
         self.content = content()
+        self.bottomContent = bottomContent()
     }
-
+    
     private var defaultBackground: LinearGradient {
         LinearGradient(
             colors: Array(repeating: schemeColors.background.foreground, count: 6) + [schemeColors.background.background],
@@ -74,7 +74,7 @@ public struct BaseView<Content: View, BottomContent: View>: View {
             endPoint: .topTrailing
         )
     }
-
+    
     public var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -86,10 +86,13 @@ public struct BaseView<Content: View, BottomContent: View>: View {
                     .frame(maxWidth: .infinity, alignment: .topLeading)
                 }
                 .frame(maxHeight: .infinity)
-
-                bottomContent
-                    .padding(padding)
-                    .background(.ultraThinMaterial.opacity(0.5))
+                
+                HStack {
+                    bottomContent
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
+                .padding(padding)
+                .background(.ultraThinMaterial.opacity(0.5))
             }
             .frame(maxHeight: .infinity, alignment: .top)
             .background(background ?? defaultBackground)
@@ -101,21 +104,9 @@ public struct BaseView<Content: View, BottomContent: View>: View {
 
 #Preview("With Bottom Content") {
     BaseView(
-        navigationTitle: "Add Quest",
-        bottomContent: {
-            DesignButton(title: "Save") {
-                print("Save tapped")
-            }
-        }
-    ) {
-        VStack(spacing: 8) {
-            DesignCard {
-                Text("Add your new quest")
-            }
-            DesignTextField(
-                placeholder: "Enter quest name",
-                text: .constant("Read 5 pages")
-            )
+        navigationTitle: "With bottom content",
+        content: {
+            Text("Main Content")
             DesignCard {
                 Text("Add your new quest")
             }
@@ -156,8 +147,13 @@ public struct BaseView<Content: View, BottomContent: View>: View {
                 Text("Add your new quest")
             }
             DesignProgressBar(value: 0.6)
+        },
+        bottomContent: {
+            DesignButton(
+                title: "Bottom content"
+            )
         }
-    }
+    )
 }
 
 #Preview("Without Bottom Content") {
