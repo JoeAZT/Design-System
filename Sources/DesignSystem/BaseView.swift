@@ -1,32 +1,49 @@
 import SwiftUI
 
 /// A foundational container view that provides consistent background styling, padding,
-/// and structured layout for screen content.
+/// and structured layout for screen content, with optional leading/trailing toolbar items.
 ///
-/// `BaseView` is intended as the root container for your app's screens. It supports:
-/// - A customizable background (provided gradient or design system fallback)
-/// - Configurable layout padding and horizontal alignment
-/// - A scrollable main content area
+/// Usage:
+/// - No toolbars:
+///   BaseView(navigationTitle: "Title") { /* content */ }
 ///
-/// - Parameters:
-///   - navigationTitle: Optional title for the navigation bar.
-///   - content: The main body content of the screen.
-///   - alignment: Horizontal alignment of the main content. Defaults to `.leading`.
-///   - background: Optional background gradient. If not provided, a default from the design scheme is used.
-///   - padding: Horizontal padding around the main content. Defaults to `16`.
+/// - Only leading toolbar:
+///   BaseView(navigationTitle: "Title", leadingToolbar: { Button("Close"){} }) { /* content */ }
 ///
-public struct BaseView<Content: View>: View {
+/// - Only trailing toolbar:
+///   BaseView(navigationTitle: "Title", trailingToolbar: { Button("Save"){} }) { /* content */ }
+///
+/// - Both toolbars:
+///   BaseView(navigationTitle: "Title",
+///            leadingToolbar: { Button("Back"){} },
+///            trailingToolbar: { Button("Done"){} }) { /* content */ }
+public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
+    // MARK: - Stored properties
     private let background: LinearGradient?
     private let padding: CGFloat
     private let content: Content
     private let alignment: HorizontalAlignment
     private let navigationTitle: String?
-
+    private let leadingToolbar: Leading
+    private let trailingToolbar: Trailing
+    
     @Environment(\.designSchemeColors) private var schemeColors
-
+    
+    // MARK: - Design background
+    private var defaultBackground: LinearGradient {
+        LinearGradient(
+            colors: Array(repeating: schemeColors.background.foreground, count: 6) + [schemeColors.background.background],
+            startPoint: .bottomLeading,
+            endPoint: .topTrailing
+        )
+    }
+    
+    // MARK: - Designated initialiser
     public init(
         navigationTitle: String? = nil,
         @ViewBuilder content: () -> Content,
+        @ViewBuilder leadingToolbar: () -> Leading,
+        @ViewBuilder trailingToolbar: () -> Trailing,
         alignment: HorizontalAlignment = .leading,
         background: LinearGradient? = nil,
         padding: CGFloat = 16
@@ -36,16 +53,11 @@ public struct BaseView<Content: View>: View {
         self.alignment = alignment
         self.navigationTitle = navigationTitle
         self.content = content()
+        self.leadingToolbar = leadingToolbar()
+        self.trailingToolbar = trailingToolbar()
     }
-
-    private var defaultBackground: LinearGradient {
-        LinearGradient(
-            colors: Array(repeating: schemeColors.background.foreground, count: 6) + [schemeColors.background.background],
-            startPoint: .bottomLeading,
-            endPoint: .topTrailing
-        )
-    }
-
+    
+    // MARK: - Body
     public var body: some View {
         NavigationStack {
             ScrollView {
@@ -55,25 +67,158 @@ public struct BaseView<Content: View>: View {
                 .padding(.horizontal, padding)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
             }
-            .frame(maxHeight: .infinity) // keep content pinned to top when short
+            .frame(maxHeight: .infinity)
             .background(background ?? defaultBackground)
             .foregroundStyle(schemeColors.primary.foreground)
             .navigationTitle(navigationTitle ?? "")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) { leadingToolbar }
+                ToolbarItem(placement: .topBarTrailing) { trailingToolbar }
+            }
         }
     }
 }
 
-#Preview("Without Bottom Content") {
-    BaseView(navigationTitle: "Progress Overview") {
-        VStack(spacing: 24) {
-            DesignCard {
-                Text("Progress")
-                DesignProgressBar(value: 0.5)
-            }
-            DesignTextField(
-                placeholder: "Notes",
-                text: .constant("Some notes here")
-            )
+// MARK: - Convenience initialisers (omit either/both toolbars)
+
+// No toolbars
+public extension BaseView where Leading == EmptyView, Trailing == EmptyView {
+    init(
+        navigationTitle: String? = nil,
+        @ViewBuilder content: () -> Content,
+        alignment: HorizontalAlignment = .leading,
+        background: LinearGradient? = nil,
+        padding: CGFloat = 16
+    ) {
+        self.init(
+            navigationTitle: navigationTitle,
+            content: content,
+            leadingToolbar: { EmptyView() },
+            trailingToolbar: { EmptyView() },
+            alignment: alignment,
+            background: background,
+            padding: padding
+        )
+    }
+}
+
+// Only leading toolbar (parameter order: leading, then content)
+public extension BaseView where Trailing == EmptyView {
+    init(
+        navigationTitle: String? = nil,
+        @ViewBuilder leadingToolbar: () -> Leading,
+        @ViewBuilder content: () -> Content,
+        alignment: HorizontalAlignment = .leading,
+        background: LinearGradient? = nil,
+        padding: CGFloat = 16
+    ) {
+        self.init(
+            navigationTitle: navigationTitle,
+            content: content,
+            leadingToolbar: leadingToolbar,
+            trailingToolbar: { EmptyView() },
+            alignment: alignment,
+            background: background,
+            padding: padding
+        )
+    }
+}
+
+// Only trailing toolbar (parameter order: trailing, then content)
+public extension BaseView where Leading == EmptyView {
+    init(
+        navigationTitle: String? = nil,
+        @ViewBuilder trailingToolbar: () -> Trailing,
+        @ViewBuilder content: () -> Content,
+        alignment: HorizontalAlignment = .leading,
+        background: LinearGradient? = nil,
+        padding: CGFloat = 16
+    ) {
+        self.init(
+            navigationTitle: navigationTitle,
+            content: content,
+            leadingToolbar: { EmptyView() },
+            trailingToolbar: trailingToolbar,
+            alignment: alignment,
+            background: background,
+            padding: padding
+        )
+    }
+}
+
+// Both toolbars (order: leading, trailing, content for natural call-sites)
+public extension BaseView {
+    init(
+        navigationTitle: String? = nil,
+        @ViewBuilder leadingToolbar: () -> Leading,
+        @ViewBuilder trailingToolbar: () -> Trailing,
+        @ViewBuilder content: () -> Content,
+        alignment: HorizontalAlignment = .leading,
+        background: LinearGradient? = nil,
+        padding: CGFloat = 16
+    ) {
+        self.init(
+            navigationTitle: navigationTitle,
+            content: content,
+            leadingToolbar: leadingToolbar,
+            trailingToolbar: trailingToolbar,
+            alignment: alignment,
+            background: background,
+            padding: padding
+        )
+    }
+}
+
+// MARK: - Previews
+
+#Preview("No Toolbar") {
+    BaseView(navigationTitle: "Overview") {
+        VStack(spacing: 16) {
+            DesignCard { Text("Card 1") }
+            DesignCard { Text("Card 2") }
+            DesignProgressBar(value: 0.4)
+        }
+    }
+}
+
+#Preview("Only Leading Toolbar") {
+    BaseView(
+        navigationTitle: "Detail",
+        leadingToolbar: {
+            Button("Close") { print("Close tapped") }
+        }
+    ) {
+        VStack(spacing: 16) {
+            Text("This screen has a leading toolbar button.")
+            DesignProgressBar(value: 0.5)
+        }
+    }
+}
+
+#Preview("Only Trailing Toolbar") {
+    BaseView(
+        navigationTitle: "Edit",
+        trailingToolbar: {
+            Button("Save") { print("Save tapped") }
+        }
+    ) {
+        VStack(spacing: 16) {
+            Text("This screen has a trailing toolbar button.")
+            DesignProgressBar(value: 0.8)
+        }
+    }
+}
+
+#Preview("Both Toolbars") {
+    BaseView(
+        navigationTitle: "Item",
+        leadingToolbar: { Button("Back") { print("Back tapped") } },
+        trailingToolbar: { Button("Done") { print("Done tapped") } }
+    ) {
+        Text("This screen has both leading and trailing toolbar buttons.")
+        DesignCard { Text("Toolbar demo") }
+        DesignButton(title: "Button") {
+            print("Button")
         }
     }
 }
