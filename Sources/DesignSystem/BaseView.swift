@@ -225,7 +225,7 @@ public extension BaseView {
 private struct ToolbarControlsPreviewHost: View {
     @State private var isEnabled: Bool = true
     @State private var filter: Filter = .all
-
+    
     enum Filter: String, CaseIterable, Identifiable {
         case all, open, done
         var id: Self { self }
@@ -237,7 +237,7 @@ private struct ToolbarControlsPreviewHost: View {
             }
         }
     }
-
+    
     var body: some View {
         BaseView(
             navigationTitle: "Toolbar Controls",
@@ -252,20 +252,17 @@ private struct ToolbarControlsPreviewHost: View {
                 }
             }
         ) {
-            VStack(alignment: .leading, spacing: 16) {
-                Toggle("", isOn: $isEnabled)
-                Text("Enabled: \(isEnabled ? "Yes" : "No")")
-                Text("Filter: \(filter.title)")
-                Picker("Filter", selection: $filter) {
-                    ForEach(Filter.allCases) { f in
-                        Text(f.title).tag(f)
-                    }
+            Picker("Filter", selection: $filter) {
+                ForEach(Filter.allCases) { f in
+                    Text(f.title).tag(f)
                 }
-                .pickerStyle(.segmented)
-                Divider()
-                Text("Content updates live as you change toolbar controls.")
             }
-            .padding(.top, 20)
+            .pickerStyle(.segmented)
+            Toggle("", isOn: $isEnabled)
+            Text("Enabled: \(isEnabled ? "Yes" : "No")")
+            Text("Filter: \(filter.title)")
+            Divider()
+            Text("Content updates live as you change toolbar controls.")
         }
     }
 }
