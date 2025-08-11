@@ -253,8 +253,8 @@ private struct ToolbarControlsPreviewHost: View {
             }
         ) {
             Picker("Filter", selection: $filter) {
-                ForEach(Filter.allCases) { f in
-                    Text(f.title).tag(f)
+                ForEach(Filter.allCases) { value in
+                    Text(value.title).tag(value)
                 }
             }
             .pickerStyle(.segmented)
