@@ -215,10 +215,61 @@ public extension BaseView {
         leadingToolbar: { Button("Back") { print("Back tapped") } },
         trailingToolbar: { Button("Done") { print("Done tapped") } }
     ) {
-        Text("This screen has both leading and trailing toolbar buttons.")
-        DesignCard { Text("Toolbar demo") }
-        DesignButton(title: "Button") {
-            print("Button")
+        VStack(spacing: 16) {
+            Text("This screen has both leading and trailing toolbar buttons.")
+            DesignCard { Text("Toolbar demo") }
         }
     }
+}
+
+private struct ToolbarControlsPreviewHost: View {
+    @State private var isEnabled: Bool = true
+    @State private var filter: Filter = .all
+
+    enum Filter: String, CaseIterable, Identifiable {
+        case all, open, done
+        var id: Self { self }
+        var title: String {
+            switch self {
+            case .all: return "All"
+            case .open: return "Open"
+            case .done: return "Done"
+            }
+        }
+    }
+
+    var body: some View {
+        BaseView(
+            navigationTitle: "Toolbar Controls",
+            leadingToolbar: {
+                Button("< back") {
+                    print("back")
+                }
+            },
+            trailingToolbar: {
+                Button("+") {
+                    print("back")
+                }
+            }
+        ) {
+            VStack(alignment: .leading, spacing: 16) {
+                Toggle("", isOn: $isEnabled)
+                Text("Enabled: \(isEnabled ? "Yes" : "No")")
+                Text("Filter: \(filter.title)")
+                Picker("Filter", selection: $filter) {
+                    ForEach(Filter.allCases) { f in
+                        Text(f.title).tag(f)
+                    }
+                }
+                .pickerStyle(.segmented)
+                Divider()
+                Text("Content updates live as you change toolbar controls.")
+            }
+            .padding(.top, 20)
+        }
+    }
+}
+
+#Preview("Toolbar: Toggle + Picker") {
+    ToolbarControlsPreviewHost()
 }
