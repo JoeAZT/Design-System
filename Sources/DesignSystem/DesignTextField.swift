@@ -1,18 +1,21 @@
 import SwiftUI
 
 /// A theme-aware text field for user input, styled according to your design system.
-/// Supports optional leading/trailing adornments (e.g. "£", "%").
+/// Supports an optional heading and optional leading/trailing adornments (e.g. "£", "%").
 ///
 /// - Parameters:
-///   - placeholder: The placeholder text to display when the field is empty.
-///   - text: A binding to the text value.
+///   - placeholder: Placeholder text shown when the field is empty.
+///   - text: Binding to the field’s text.
+///   - heading: Optional text rendered **above** the input (e.g. “Amount”).
 ///   - scheme: Optional color scheme override; otherwise inherits from the environment.
-///   - leadingSymbol: Optional text shown before the input (e.g. "£").
-///   - trailingSymbol: Optional text shown after the input (e.g. "%").
-///   - keyboard: Optional keyboard type (defaults to `.decimalPad` when a symbol is provided, else `.default`).
+///   - leadingSymbol: Optional text shown **before** the input (e.g. "£").
+///   - trailingSymbol: Optional text shown **after** the input (e.g. "%").
+///   - keyboard: Optional keyboard type. If not provided and an adornment exists,
+///               the keyboard defaults to `.decimalPad`, otherwise `.default`.
 public struct DesignTextField: View {
     let placeholder: String
     @Binding var text: String
+    let heading: String?
     let scheme: DesignScheme?
     let leadingSymbol: String?
     let trailingSymbol: String?
@@ -24,6 +27,7 @@ public struct DesignTextField: View {
     public init(
         placeholder: String,
         text: Binding<String>,
+        heading: String? = nil,
         scheme: DesignScheme? = nil,
         leadingSymbol: String? = nil,
         trailingSymbol: String? = nil,
@@ -31,6 +35,7 @@ public struct DesignTextField: View {
     ) {
         self.placeholder = placeholder
         self._text = text
+        self.heading = heading
         self.scheme = scheme
         self.leadingSymbol = leadingSymbol
         self.trailingSymbol = trailingSymbol
@@ -39,37 +44,49 @@ public struct DesignTextField: View {
 
     private var colorPair: DesignSchemeColorPair { schemeColors.colors(for: resolvedScheme) }
     private var resolvedScheme: DesignScheme { scheme ?? defaultChildScheme }
+    private var hasAdornment: Bool { leadingSymbol != nil || trailingSymbol != nil }
     private var resolvedKeyboard: UIKeyboardType {
-        if let keyboard { return keyboard }
-        return (leadingSymbol != nil || trailingSymbol != nil) ? .decimalPad : .default
+        keyboard ?? (hasAdornment ? .decimalPad : .default)
     }
 
     public var body: some View {
-        HStack(spacing: 8) {
-            if let leading = leadingSymbol {
-                Text(leading)
+        VStack(alignment: .leading, spacing: 6) {
+            if let heading {
+                Text(heading)
+                    .font(.subheadline)
                     .foregroundColor(colorPair.foreground)
-                    .accessibilityHidden(true)
+                    .accessibilityAddTraits(.isStaticText)
             }
 
-            TextField(
-                "",
-                text: $text,
-                prompt: Text(placeholder).foregroundColor(colorPair.foreground)
-            )
-            .keyboardType(resolvedKeyboard)
-            .foregroundColor(colorPair.foreground)
+            HStack(spacing: 8) {
+                if let leading = leadingSymbol {
+                    Text(leading)
+                        .foregroundColor(colorPair.foreground)
+                        .accessibilityHidden(true)
+                        // Optional: keep width stable to avoid layout shift
+                        .frame(minWidth: 12, alignment: .leading)
+                }
 
-            if let trailing = trailingSymbol {
-                Text(trailing)
-                    .foregroundColor(colorPair.foreground)
-                    .accessibilityHidden(true)
+                TextField(
+                    "",
+                    text: $text,
+                    prompt: Text(placeholder).foregroundColor(colorPair.foreground)
+                )
+                .keyboardType(resolvedKeyboard)
+                .foregroundColor(colorPair.foreground)
+
+                if let trailing = trailingSymbol {
+                    Text(trailing)
+                        .foregroundColor(colorPair.foreground)
+                        .accessibilityHidden(true)
+                        .frame(minWidth: 12, alignment: .trailing)
+                }
             }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(colorPair.background)
+            .cornerRadius(10)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(colorPair.background)
-        .cornerRadius(10)
     }
 }
 
@@ -84,16 +101,15 @@ public struct DesignTextField: View {
             placeholder: "100.00",
             text: .constant(""),
             scheme: .secondary,
-            leadingSymbol: "£",
-            keyboard: .decimalPad
+            leadingSymbol: "£"
         )
         DesignTextField(
             placeholder: "1.47",
             text: .constant(""),
-            scheme: .secondary,
-            leadingSymbol: "   ",
-            trailingSymbol: "%",
-            keyboard: .decimalPad
+            heading: "Interest rate",
+            scheme: .accent,
+            trailingSymbol: "%"
         )
     }
+    .padding()
 }
