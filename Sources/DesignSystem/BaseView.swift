@@ -20,9 +20,9 @@ import SwiftUI
 public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
     // MARK: - Stored properties
     private let background: LinearGradient?
+    private let alignment: HorizontalAlignment
     private let padding: CGFloat
     private let content: Content
-    private let alignment: HorizontalAlignment
     private let navigationTitle: String?
     private let leadingToolbar: Leading
     private let trailingToolbar: Trailing
@@ -41,16 +41,17 @@ public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
     // MARK: - Designated initialiser
     public init(
         navigationTitle: String? = nil,
+        alignment: HorizontalAlignment = .leading,
         @ViewBuilder content: () -> Content,
         @ViewBuilder leadingToolbar: () -> Leading,
         @ViewBuilder trailingToolbar: () -> Trailing,
-        alignment: HorizontalAlignment = .leading,
+        
         background: LinearGradient? = nil,
         padding: CGFloat = 16
     ) {
+        self.alignment = alignment
         self.background = background
         self.padding = padding
-        self.alignment = alignment
         self.navigationTitle = navigationTitle
         self.content = content()
         self.leadingToolbar = leadingToolbar()
@@ -85,17 +86,17 @@ public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
 public extension BaseView where Leading == EmptyView, Trailing == EmptyView {
     init(
         navigationTitle: String? = nil,
-        @ViewBuilder content: () -> Content,
         alignment: HorizontalAlignment = .leading,
+        @ViewBuilder content: () -> Content,
         background: LinearGradient? = nil,
         padding: CGFloat = 16
     ) {
         self.init(
             navigationTitle: navigationTitle,
+            alignment: alignment,
             content: content,
             leadingToolbar: { EmptyView() },
             trailingToolbar: { EmptyView() },
-            alignment: alignment,
             background: background,
             padding: padding
         )
@@ -106,18 +107,18 @@ public extension BaseView where Leading == EmptyView, Trailing == EmptyView {
 public extension BaseView where Trailing == EmptyView {
     init(
         navigationTitle: String? = nil,
+        alignment: HorizontalAlignment = .leading,
         @ViewBuilder leadingToolbar: () -> Leading,
         @ViewBuilder content: () -> Content,
-        alignment: HorizontalAlignment = .leading,
         background: LinearGradient? = nil,
         padding: CGFloat = 16
     ) {
         self.init(
             navigationTitle: navigationTitle,
+            alignment: alignment,
             content: content,
             leadingToolbar: leadingToolbar,
             trailingToolbar: { EmptyView() },
-            alignment: alignment,
             background: background,
             padding: padding
         )
@@ -128,18 +129,18 @@ public extension BaseView where Trailing == EmptyView {
 public extension BaseView where Leading == EmptyView {
     init(
         navigationTitle: String? = nil,
+        alignment: HorizontalAlignment = .leading,
         @ViewBuilder trailingToolbar: () -> Trailing,
         @ViewBuilder content: () -> Content,
-        alignment: HorizontalAlignment = .leading,
         background: LinearGradient? = nil,
         padding: CGFloat = 16
     ) {
         self.init(
             navigationTitle: navigationTitle,
+            alignment: alignment,
             content: content,
             leadingToolbar: { EmptyView() },
             trailingToolbar: trailingToolbar,
-            alignment: alignment,
             background: background,
             padding: padding
         )
@@ -159,10 +160,10 @@ public extension BaseView {
     ) {
         self.init(
             navigationTitle: navigationTitle,
+            alignment: alignment,
             content: content,
             leadingToolbar: leadingToolbar,
             trailingToolbar: trailingToolbar,
-            alignment: alignment,
             background: background,
             padding: padding
         )
