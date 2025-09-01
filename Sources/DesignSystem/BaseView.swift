@@ -66,7 +66,7 @@ public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
                     content
                 }
                 .padding(.horizontal, padding)
-                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .frame(maxWidth: .infinity, alignment: alignment)
             }
             .frame(maxHeight: .infinity)
             .background(background ?? defaultBackground)
