@@ -47,10 +47,13 @@ where Data: RandomAccessCollection, Data.Element: Identifiable {
                 } header: {
                     VStack(alignment: .leading, spacing: 2) {
                         if let title {
-                            Text(title).font(.headline)
+                            Text(title)
+                                .font(.headline)
                         }
                         if let subtitle {
-                            Text(subtitle).font(.subheadline).foregroundStyle(.secondary)
+                            Text(subtitle)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
