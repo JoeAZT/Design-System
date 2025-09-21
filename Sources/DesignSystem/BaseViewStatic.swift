@@ -10,10 +10,10 @@ import SwiftUI
 ///
 /// ### Parameters
 /// - `navigationTitle`: Optional navigation bar title.
+/// - `padding`: Horizontal padding between content and screen edges (defaults to 16).
 /// - `position`: Controls both the container alignment (`frameAlignment`) and the internal
 ///   `VStack` alignment. Defaults to `.topLeading`.
 /// - `background`: Optional custom background gradient (defaults to design system background).
-/// - `padding`: Horizontal padding between content and screen edges (defaults to 16).
 /// - `leadingToolbar`: Optional leading toolbar view.
 /// - `trailingToolbar`: Optional trailing toolbar view.
 /// - `content`: The main screen content.
@@ -62,8 +62,8 @@ import SwiftUI
 
 public struct BaseViewStatic<Content: View, Leading: View, Trailing: View>: View {
     private let background: LinearGradient?
-    private let position: ContentPosition
     private let padding: CGFloat
+    private let position: ContentPosition
     private let content: Content
     private let navigationTitle: String?
     private let leadingToolbar: Leading
@@ -88,9 +88,9 @@ public struct BaseViewStatic<Content: View, Leading: View, Trailing: View>: View
         @ViewBuilder trailingToolbar: () -> Trailing,
         background: LinearGradient? = nil,
     ) {
+        self.padding = padding
         self.position = position
         self.background = background
-        self.padding = padding
         self.navigationTitle = navigationTitle
         self.content = content()
         self.leadingToolbar = leadingToolbar()
@@ -120,10 +120,10 @@ public struct BaseViewStatic<Content: View, Leading: View, Trailing: View>: View
 public extension BaseViewStatic where Leading == EmptyView, Trailing == EmptyView {
     init(
         navigationTitle: String? = nil,
+        padding: CGFloat = 16,
         position: ContentPosition = .topLeading,
         @ViewBuilder content: () -> Content,
         background: LinearGradient? = nil,
-        padding: CGFloat = 16
     ) {
         self.init(
             navigationTitle: navigationTitle,
@@ -140,11 +140,11 @@ public extension BaseViewStatic where Leading == EmptyView, Trailing == EmptyVie
 public extension BaseViewStatic where Trailing == EmptyView {
     init(
         navigationTitle: String? = nil,
+        padding: CGFloat = 16,
         position: ContentPosition = .topLeading,
         @ViewBuilder leadingToolbar: () -> Leading,
         @ViewBuilder content: () -> Content,
         background: LinearGradient? = nil,
-        padding: CGFloat = 16
     ) {
         self.init(
             navigationTitle: navigationTitle,
