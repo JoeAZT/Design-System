@@ -78,6 +78,7 @@ public struct DesignList<Content: View>: View {
             if title != nil || subtitle != nil {
                 Section {
                     content
+                        .listRowSeparator(hideSeparators ? .hidden : .automatic)
                 } header: {
                     VStack(alignment: .leading, spacing: 2) {
                         if let title { Text(title).font(.headline) }
@@ -85,17 +86,14 @@ public struct DesignList<Content: View>: View {
                     }
                     .textCase(nil)
                 }
-                .listSectionSeparator(.hidden, edges: .all) // hide section divider
             } else {
                 content
             }
         }
-        .listSectionSeparator(.hidden, edges: .all) // hide section divider
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(backgroundStyle == .schemed ? colorPair.background : Color.clear)
         .foregroundStyle(colorPair.foreground)
-        .modifier(_GlobalSeparatorHiding(hideSeparators: hideSeparators))
     }
 }
 
