@@ -21,7 +21,6 @@ public struct DesignList<Content: View>: View {
     
     // Appearance controls
     private let backgroundStyle: DesignListBackground
-    private let hideSeparators: Bool
     
     // Rendered rows/sections
     private let content: Content
@@ -35,14 +34,12 @@ public struct DesignList<Content: View>: View {
         subtitle: String? = nil,
         scheme: DesignScheme? = nil,
         backgroundStyle: DesignListBackground = .schemed,
-        hideSeparators: Bool = true,
         @ViewBuilder content: () -> Content
     ) {
         self.title = title
         self.subtitle = subtitle
         self.scheme = scheme
         self.backgroundStyle = backgroundStyle
-        self.hideSeparators = hideSeparators
         self.content = content()
     }
     
@@ -52,7 +49,6 @@ public struct DesignList<Content: View>: View {
         subtitle: String? = nil,
         scheme: DesignScheme? = nil,
         backgroundStyle: DesignListBackground = .schemed,
-        hideSeparators: Bool = false,
         data: Data,
         onDelete: ((IndexSet) -> Void)? = nil,
         @ViewBuilder row: @escaping (Data.Element) -> Row
@@ -66,8 +62,7 @@ public struct DesignList<Content: View>: View {
         self.subtitle = subtitle
         self.scheme = scheme
         self.backgroundStyle = backgroundStyle
-        self.hideSeparators = hideSeparators
-        self.content = _DesignListRows(data: data, onDelete: onDelete, row: row, hideSeparators: hideSeparators)
+        self.content = _DesignListRows(data: data, onDelete: onDelete, row: row)
     }
     
     private var resolvedScheme: DesignScheme { scheme ?? defaultChildScheme }
@@ -78,7 +73,6 @@ public struct DesignList<Content: View>: View {
             if title != nil || subtitle != nil {
                 Section {
                     content
-                        .listRowSeparator(hideSeparators ? .hidden : .automatic)
                 } header: {
                     VStack(alignment: .leading, spacing: 2) {
                         if let title { Text(title).font(.headline) }
@@ -104,17 +98,14 @@ where Data: RandomAccessCollection, Data.Element: Identifiable {
     let data: Data
     let onDelete: ((IndexSet) -> Void)?
     let row: (Data.Element) -> Row
-    let hideSeparators: Bool
     
     public var body: some View {
         if let onDelete {
             ForEach(data) { item in row(item) }
                 .onDelete(perform: onDelete)
-                .listRowSeparator(hideSeparators ? .hidden : .automatic)
                 .listRowBackground(Color.clear) // plays nice with transparent list
         } else {
             ForEach(data) { item in row(item) }
-                .listRowSeparator(hideSeparators ? .hidden : .automatic)
                 .listRowBackground(Color.clear)
         }
     }
@@ -122,16 +113,7 @@ where Data: RandomAccessCollection, Data.Element: Identifiable {
 
 // MARK: - Global separator hiding for arbitrary multi-section content
 private struct _GlobalSeparatorHiding: ViewModifier {
-    let hideSeparators: Bool
     func body(content: Content) -> some View {
-        if hideSeparators {
-            content
-                .listRowSeparator(.hidden)                 // rows (iOS 15+)
-                .listRowSeparatorTint(.clear)              // belt & braces
-                .listSectionSeparator(.hidden, edges: .all) // section dividers (iOS 16+)
-        } else {
-            content
-        }
+        content
     }
 }
-
