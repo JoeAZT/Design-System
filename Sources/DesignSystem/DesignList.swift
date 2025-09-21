@@ -35,7 +35,7 @@ public struct DesignList<Content: View>: View {
         subtitle: String? = nil,
         scheme: DesignScheme? = nil,
         backgroundStyle: DesignListBackground = .schemed,
-        hideSeparators: Bool = false,
+        hideSeparators: Bool = true,
         @ViewBuilder content: () -> Content
     ) {
         self.title = title
