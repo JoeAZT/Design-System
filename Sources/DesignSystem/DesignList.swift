@@ -7,37 +7,52 @@
 
 import SwiftUI
 
+public enum DesignListBackground {
+    case schemed   // uses your design system colors
+    case clear     // fully transparent; lets parent background show through
+}
+
 public struct DesignList<Content: View>: View {
 
-    // Optional header text for the *whole list*
+    // Optional list-level header
     private let title: String?
     private let subtitle: String?
     private let scheme: DesignScheme?
 
-    // Rendered rows/sections built by caller
+    // Appearance controls
+    private let backgroundStyle: DesignListBackground
+    private let hideSeparators: Bool
+
+    // Rendered rows/sections
     private let content: Content
 
     @Environment(\.designSchemeColors) private var schemeColors
     @Environment(\.designSystemDefaultChildScheme) private var defaultChildScheme
 
-    // MARK: - Primary initializer (multi-section / arbitrary content)
+    // MARK: Primary initializer (arbitrary content / multi-section)
     public init(
         title: String? = nil,
         subtitle: String? = nil,
         scheme: DesignScheme? = nil,
+        backgroundStyle: DesignListBackground = .schemed,
+        hideSeparators: Bool = false,
         @ViewBuilder content: () -> Content
     ) {
         self.title = title
         self.subtitle = subtitle
         self.scheme = scheme
+        self.backgroundStyle = backgroundStyle
+        self.hideSeparators = hideSeparators
         self.content = content()
     }
 
-    // MARK: - Convenience initializer (single dataset like your current API)
+    // MARK: Convenience initializer (single dataset)
     public init<Data, Row>(
         title: String? = nil,
         subtitle: String? = nil,
         scheme: DesignScheme? = nil,
+        backgroundStyle: DesignListBackground = .schemed,
+        hideSeparators: Bool = false,
         data: Data,
         onDelete: ((IndexSet) -> Void)? = nil,
         @ViewBuilder row: @escaping (Data.Element) -> Row
@@ -50,7 +65,9 @@ public struct DesignList<Content: View>: View {
         self.title = title
         self.subtitle = subtitle
         self.scheme = scheme
-        self.content = _DesignListRows(data: data, onDelete: onDelete, row: row)
+        self.backgroundStyle = backgroundStyle
+        self.hideSeparators = hideSeparators
+        self.content = _DesignListRows(data: data, onDelete: onDelete, row: row, hideSeparators: hideSeparators)
     }
 
     private var resolvedScheme: DesignScheme { scheme ?? defaultChildScheme }
@@ -58,7 +75,6 @@ public struct DesignList<Content: View>: View {
 
     public var body: some View {
         List {
-            // Optional list-level header (not the same as Section headers)
             if title != nil || subtitle != nil {
                 Section {
                     content
@@ -74,26 +90,49 @@ public struct DesignList<Content: View>: View {
             }
         }
         .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        .background(colorPair.background)
+        // Background handling
+        .scrollContentBackground(.hidden)                                  // allow parent to show
+        .background(backgroundStyle == .schemed ? colorPair.background
+                                                : Color.clear)
         .foregroundStyle(colorPair.foreground)
+        // Separator handling (best-effort global)
+        .modifier(_GlobalSeparatorHiding(hideSeparators: hideSeparators))
     }
 }
 
-// MARK: - Internal helper used by the convenience initializer
+// MARK: - Helper rows for convenience initializer
 public struct _DesignListRows<Data, Row: View>: View
 where Data: RandomAccessCollection, Data.Element: Identifiable {
 
     let data: Data
     let onDelete: ((IndexSet) -> Void)?
     let row: (Data.Element) -> Row
+    let hideSeparators: Bool
 
     public var body: some View {
         if let onDelete {
             ForEach(data) { item in row(item) }
                 .onDelete(perform: onDelete)
+                .listRowSeparator(hideSeparators ? .hidden : .automatic)
+                .listRowBackground(Color.clear) // plays nice with transparent list
         } else {
             ForEach(data) { item in row(item) }
+                .listRowSeparator(hideSeparators ? .hidden : .automatic)
+                .listRowBackground(Color.clear)
+        }
+    }
+}
+
+// MARK: - Global separator hiding for arbitrary multi-section content
+private struct _GlobalSeparatorHiding: ViewModifier {
+    let hideSeparators: Bool
+    func body(content: Content) -> some View {
+        if hideSeparators {
+            content
+                .listRowSeparatorTint(.clear)     // rows
+                .listSectionSeparator(.hidden)    // sections (iOS 16+)
+        } else {
+            content
         }
     }
 }
