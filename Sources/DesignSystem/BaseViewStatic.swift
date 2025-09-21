@@ -81,12 +81,12 @@ public struct BaseViewStatic<Content: View, Leading: View, Trailing: View>: View
 
     public init(
         navigationTitle: String? = nil,
+        padding: CGFloat = 16,
         position: ContentPosition = .topLeading,
         @ViewBuilder content: () -> Content,
         @ViewBuilder leadingToolbar: () -> Leading,
         @ViewBuilder trailingToolbar: () -> Trailing,
         background: LinearGradient? = nil,
-        padding: CGFloat = 16
     ) {
         self.position = position
         self.background = background
@@ -127,12 +127,12 @@ public extension BaseViewStatic where Leading == EmptyView, Trailing == EmptyVie
     ) {
         self.init(
             navigationTitle: navigationTitle,
+            padding: padding,
             position: position,
             content: content,
             leadingToolbar: { EmptyView() },
             trailingToolbar: { EmptyView() },
-            background: background,
-            padding: padding
+            background: background
         )
     }
 }
@@ -148,12 +148,12 @@ public extension BaseViewStatic where Trailing == EmptyView {
     ) {
         self.init(
             navigationTitle: navigationTitle,
+            padding: padding,
             position: position,
             content: content,
             leadingToolbar: leadingToolbar,
             trailingToolbar: { EmptyView() },
-            background: background,
-            padding: padding
+            background: background
         )
     }
 }
@@ -169,12 +169,12 @@ public extension BaseViewStatic where Leading == EmptyView {
     ) {
         self.init(
             navigationTitle: navigationTitle,
+            padding: padding,
             position: position,
             content: content,
             leadingToolbar: { EmptyView() },
             trailingToolbar: trailingToolbar,
-            background: background,
-            padding: padding
+            background: background
         )
     }
 }
@@ -191,12 +191,12 @@ public extension BaseViewStatic {
     ) {
         self.init(
             navigationTitle: navigationTitle,
+            padding: padding,
             position: position,
             content: content,
             leadingToolbar: leadingToolbar,
             trailingToolbar: trailingToolbar,
-            background: background,
-            padding: padding
+            background: background
         )
     }
 }
