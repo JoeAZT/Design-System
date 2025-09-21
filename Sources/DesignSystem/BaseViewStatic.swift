@@ -161,11 +161,11 @@ public extension BaseViewStatic where Trailing == EmptyView {
 public extension BaseViewStatic where Leading == EmptyView {
     init(
         navigationTitle: String? = nil,
+        padding: CGFloat = 16,
         position: ContentPosition = .topLeading,
         @ViewBuilder trailingToolbar: () -> Trailing,
         @ViewBuilder content: () -> Content,
-        background: LinearGradient? = nil,
-        padding: CGFloat = 16
+        background: LinearGradient? = nil
     ) {
         self.init(
             navigationTitle: navigationTitle,
@@ -182,12 +182,12 @@ public extension BaseViewStatic where Leading == EmptyView {
 public extension BaseViewStatic {
     init(
         navigationTitle: String? = nil,
+        padding: CGFloat = 16,
         @ViewBuilder leadingToolbar: () -> Leading,
         @ViewBuilder trailingToolbar: () -> Trailing,
         @ViewBuilder content: () -> Content,
         position: ContentPosition = .topLeading,
-        background: LinearGradient? = nil,
-        padding: CGFloat = 16
+        background: LinearGradient? = nil
     ) {
         self.init(
             navigationTitle: navigationTitle,
