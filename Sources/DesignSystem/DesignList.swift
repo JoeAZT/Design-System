@@ -90,13 +90,11 @@ public struct DesignList<Content: View>: View {
             }
         }
         .listStyle(.plain)
-        // Background handling
-        .scrollContentBackground(.hidden)                                  // allow parent to show
-        .background(backgroundStyle == .schemed ? colorPair.background
-                                                : Color.clear)
+        .scrollContentBackground(.hidden)
+        .listRowSeparator(.hidden)
+        .background(backgroundStyle == .schemed ? colorPair.background : Color.clear)
         .foregroundStyle(colorPair.foreground)
-        // Separator handling (best-effort global)
-        .modifier(_GlobalSeparatorHiding(hideSeparators: hideSeparators))
+//        .modifier(_GlobalSeparatorHiding(hideSeparators: hideSeparators))
     }
 }
 
