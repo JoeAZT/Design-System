@@ -85,10 +85,12 @@ public struct DesignList<Content: View>: View {
                     }
                     .textCase(nil)
                 }
+                .listSectionSeparator(.hidden, edges: .all) // hide section divider
             } else {
                 content
             }
         }
+        .listSectionSeparator(.hidden, edges: .all) // hide section divider
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .background(backgroundStyle == .schemed ? colorPair.background : Color.clear)
