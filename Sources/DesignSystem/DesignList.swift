@@ -145,7 +145,7 @@ private extension Double {
             colors: [.purple.opacity(0.4), .blue.opacity(0.4)],
             startPoint: .topLeading, endPoint: .bottomTrailing
         )
-            .ignoresSafeArea()
+        .ignoresSafeArea()
 
         DesignList(
             backgroundStyle: .clear

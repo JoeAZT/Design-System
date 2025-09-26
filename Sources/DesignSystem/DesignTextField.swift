@@ -20,7 +20,8 @@ public struct DesignTextField: View {
     let leadingSymbol: String?
     let trailingSymbol: String?
     let keyboard: UIKeyboardType?
-
+    let noBackground: Bool?
+        
     @Environment(\.designSchemeColors) private var schemeColors
     @Environment(\.designSystemDefaultChildScheme) private var defaultChildScheme
 
@@ -31,7 +32,8 @@ public struct DesignTextField: View {
         scheme: DesignScheme? = nil,
         leadingSymbol: String? = nil,
         trailingSymbol: String? = nil,
-        keyboard: UIKeyboardType? = nil
+        keyboard: UIKeyboardType? = nil,
+        noBackground: Bool? = nil
     ) {
         self.placeholder = placeholder
         self._text = text
@@ -40,6 +42,7 @@ public struct DesignTextField: View {
         self.leadingSymbol = leadingSymbol
         self.trailingSymbol = trailingSymbol
         self.keyboard = keyboard
+        self.noBackground = noBackground
     }
 
     private var colorPair: DesignSchemeColorPair { schemeColors.colors(for: resolvedScheme) }
@@ -63,7 +66,6 @@ public struct DesignTextField: View {
                     Text(leading)
                         .foregroundColor(colorPair.foreground)
                         .accessibilityHidden(true)
-                        // Optional: keep width stable to avoid layout shift
                         .frame(minWidth: 12, alignment: .leading)
                 }
 
@@ -82,11 +84,8 @@ public struct DesignTextField: View {
                         .frame(minWidth: 12, alignment: .trailing)
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(colorPair.background)
-            .cornerRadius(10)
         }
+        .designFieldBackground(colorPair, enabled: !(noBackground ?? false))
     }
 }
 
@@ -110,6 +109,23 @@ public struct DesignTextField: View {
             scheme: .accent,
             trailingSymbol: "%"
         )
+        DesignTextField(
+            placeholder: "1.47",
+            text: .constant(""),
+            heading: "Interest rate",
+            scheme: .accent,
+            trailingSymbol: "%",
+            noBackground: false
+        )
+        DesignTextField(
+            placeholder: "1.47",
+            text: .constant(""),
+            heading: "Interest rate",
+            scheme: .accent,
+            trailingSymbol: "%",
+            noBackground: true
+        )
     }
+    .background(.red)
     .padding()
 }
