@@ -126,6 +126,7 @@ public struct DesignTextField: View {
             noBackground: true
         )
     }
+    .padding()
     .background(.red)
     .padding()
 }
