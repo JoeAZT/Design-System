@@ -1,5 +1,7 @@
 import SwiftUI
 
+// MARK: - BaseView
+
 /// A foundational container view that provides consistent background styling, padding,
 /// and structured layout for screen content, with optional leading/trailing toolbar items
 /// and flexible alignment.
@@ -9,15 +11,27 @@ import SwiftUI
 /// - `position`: Controls both the container alignment (`frameAlignment`) and the internal
 ///   `VStack` alignment. Defaults to `.topLeading`.
 /// - `background`: Optional custom background **`ShapeStyle`** (Color, Linear/Radial/AngularGradient, Material, etc.).
-///   Defaults to a design system gradient.
+/// - `backgroundPreset`: Optional design-system preset (e.g. `.extremeTopTrailing`) that resolves to a radial gradient.
 /// - `padding`: Horizontal padding between content and screen edges (defaults to 16).
 /// - `leadingToolbar`: Optional leading toolbar view.
 /// - `trailingToolbar`: Optional trailing toolbar view.
 /// - `content`: The main screen content.
+///
+/// ### Background Resolution
+/// 1. If `background` is provided, it is used.
+/// 2. Else if `backgroundPreset` is provided, it is built from the design scheme.
+/// 3. Else the default DS linear gradient is used.
+
 public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
+    // Background
     private let background: AnyShapeStyle?
+    private let backgroundPreset: DesignBackgroundPreset?
+
+    // Layout
     private let position: ContentPosition
     private let padding: CGFloat
+
+    // Content / chrome
     private let content: Content
     private let navigationTitle: String?
     private let leadingToolbar: Leading
@@ -28,14 +42,16 @@ public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
     private var defaultBackground: AnyShapeStyle {
         AnyShapeStyle(
             LinearGradient(
-                colors: Array(repeating: schemeColors.background.foreground, count: 6) + [schemeColors.background.background],
+                colors: Array(repeating: schemeColors.background.foreground, count: 6)
+                + [schemeColors.background.background],
                 startPoint: .bottomLeading,
                 endPoint: .topTrailing
             )
         )
     }
 
-    // Designated initialiser (type-erased background)
+    // MARK: Designated Initialiser (type-erased background)
+
     public init(
         navigationTitle: String? = nil,
         position: ContentPosition = .topLeading,
@@ -43,10 +59,12 @@ public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
         @ViewBuilder leadingToolbar: () -> Leading,
         @ViewBuilder trailingToolbar: () -> Trailing,
         background: AnyShapeStyle? = nil,
+        backgroundPreset: DesignBackgroundPreset? = nil,
         padding: CGFloat = 16
     ) {
         self.position = position
         self.background = background
+        self.backgroundPreset = backgroundPreset
         self.padding = padding
         self.navigationTitle = navigationTitle
         self.content = content()
@@ -55,6 +73,12 @@ public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
     }
 
     public var body: some View {
+        // Resolve: explicit background > preset > DS default
+        let resolvedBackground: AnyShapeStyle =
+            background
+            ?? backgroundPreset?.makeStyle(using: schemeColors)
+            ?? defaultBackground
+
         NavigationStack {
             ScrollView {
                 VStack(alignment: position.stackAlignment, spacing: padding) {
@@ -63,8 +87,7 @@ public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
                 .padding(.horizontal, padding)
                 .frame(maxWidth: .infinity, alignment: position.frameAlignment)
             }
-            // Accepts any ShapeStyle
-            .background(background ?? defaultBackground)
+            .background(resolvedBackground)
             .foregroundStyle(schemeColors.primary.foreground)
             .navigationTitle(navigationTitle ?? "")
             .toolbar {
@@ -75,7 +98,7 @@ public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
     }
 }
 
-// MARK: - Convenience initialisers (no toolbars)
+// MARK: - Convenience initialisers
 
 public extension BaseView where Leading == EmptyView, Trailing == EmptyView {
     init(
@@ -83,6 +106,7 @@ public extension BaseView where Leading == EmptyView, Trailing == EmptyView {
         position: ContentPosition = .topLeading,
         @ViewBuilder content: () -> Content,
         background: AnyShapeStyle? = nil,
+        backgroundPreset: DesignBackgroundPreset? = nil,
         padding: CGFloat = 16
     ) {
         self.init(
@@ -92,12 +116,11 @@ public extension BaseView where Leading == EmptyView, Trailing == EmptyView {
             leadingToolbar: { EmptyView() },
             trailingToolbar: { EmptyView() },
             background: background,
+            backgroundPreset: backgroundPreset,
             padding: padding
         )
     }
 }
-
-// MARK: - Convenience initialisers (single toolbar)
 
 public extension BaseView where Trailing == EmptyView {
     init(
@@ -106,6 +129,7 @@ public extension BaseView where Trailing == EmptyView {
         @ViewBuilder leadingToolbar: () -> Leading,
         @ViewBuilder content: () -> Content,
         background: AnyShapeStyle? = nil,
+        backgroundPreset: DesignBackgroundPreset? = nil,
         padding: CGFloat = 16
     ) {
         self.init(
@@ -115,6 +139,7 @@ public extension BaseView where Trailing == EmptyView {
             leadingToolbar: leadingToolbar,
             trailingToolbar: { EmptyView() },
             background: background,
+            backgroundPreset: backgroundPreset,
             padding: padding
         )
     }
@@ -127,6 +152,7 @@ public extension BaseView where Leading == EmptyView {
         @ViewBuilder trailingToolbar: () -> Trailing,
         @ViewBuilder content: () -> Content,
         background: AnyShapeStyle? = nil,
+        backgroundPreset: DesignBackgroundPreset? = nil,
         padding: CGFloat = 16
     ) {
         self.init(
@@ -136,13 +162,14 @@ public extension BaseView where Leading == EmptyView {
             leadingToolbar: { EmptyView() },
             trailingToolbar: trailingToolbar,
             background: background,
+            backgroundPreset: backgroundPreset,
             padding: padding
         )
     }
 }
 
-// MARK: - Argument order variant
 public extension BaseView {
+    /// Argument-order variant
     init(
         navigationTitle: String? = nil,
         @ViewBuilder leadingToolbar: () -> Leading,
@@ -150,6 +177,7 @@ public extension BaseView {
         @ViewBuilder content: () -> Content,
         position: ContentPosition = .topLeading,
         background: AnyShapeStyle? = nil,
+        backgroundPreset: DesignBackgroundPreset? = nil,
         padding: CGFloat = 16
     ) {
         self.init(
@@ -159,6 +187,7 @@ public extension BaseView {
             leadingToolbar: leadingToolbar,
             trailingToolbar: trailingToolbar,
             background: background,
+            backgroundPreset: backgroundPreset,
             padding: padding
         )
     }
@@ -175,6 +204,7 @@ public extension BaseView {
         @ViewBuilder leadingToolbar: () -> Leading,
         @ViewBuilder trailingToolbar: () -> Trailing,
         background: S?,
+        backgroundPreset: DesignBackgroundPreset? = nil,
         padding: CGFloat = 16
     ) {
         self.init(
@@ -184,6 +214,7 @@ public extension BaseView {
             leadingToolbar: leadingToolbar,
             trailingToolbar: trailingToolbar,
             background: background.map(AnyShapeStyle.init),
+            backgroundPreset: backgroundPreset,
             padding: padding
         )
     }
@@ -195,6 +226,7 @@ public extension BaseView where Leading == EmptyView, Trailing == EmptyView {
         position: ContentPosition = .topLeading,
         @ViewBuilder content: () -> Content,
         background: S?,
+        backgroundPreset: DesignBackgroundPreset? = nil,
         padding: CGFloat = 16
     ) {
         self.init(
@@ -204,6 +236,7 @@ public extension BaseView where Leading == EmptyView, Trailing == EmptyView {
             leadingToolbar: { EmptyView() },
             trailingToolbar: { EmptyView() },
             background: background.map(AnyShapeStyle.init),
+            backgroundPreset: backgroundPreset,
             padding: padding
         )
     }
@@ -216,6 +249,7 @@ public extension BaseView where Trailing == EmptyView {
         @ViewBuilder leadingToolbar: () -> Leading,
         @ViewBuilder content: () -> Content,
         background: S?,
+        backgroundPreset: DesignBackgroundPreset? = nil,
         padding: CGFloat = 16
     ) {
         self.init(
@@ -225,6 +259,7 @@ public extension BaseView where Trailing == EmptyView {
             leadingToolbar: leadingToolbar,
             trailingToolbar: { EmptyView() },
             background: background.map(AnyShapeStyle.init),
+            backgroundPreset: backgroundPreset,
             padding: padding
         )
     }
@@ -237,6 +272,7 @@ public extension BaseView where Leading == EmptyView {
         @ViewBuilder trailingToolbar: () -> Trailing,
         @ViewBuilder content: () -> Content,
         background: S?,
+        backgroundPreset: DesignBackgroundPreset? = nil,
         padding: CGFloat = 16
     ) {
         self.init(
@@ -246,6 +282,7 @@ public extension BaseView where Leading == EmptyView {
             leadingToolbar: { EmptyView() },
             trailingToolbar: trailingToolbar,
             background: background.map(AnyShapeStyle.init),
+            backgroundPreset: backgroundPreset,
             padding: padding
         )
     }
@@ -259,6 +296,7 @@ public extension BaseView {
         @ViewBuilder content: () -> Content,
         position: ContentPosition = .topLeading,
         background: S?,
+        backgroundPreset: DesignBackgroundPreset? = nil,
         padding: CGFloat = 16
     ) {
         self.init(
@@ -268,7 +306,26 @@ public extension BaseView {
             leadingToolbar: leadingToolbar,
             trailingToolbar: trailingToolbar,
             background: background.map(AnyShapeStyle.init),
+            backgroundPreset: backgroundPreset,
             padding: padding
         )
+    }
+}
+
+// MARK: - Optional sugar: apply presets anywhere
+
+public extension View {
+    /// Applies a DS-driven background preset to any view.
+    func designBackground(_ preset: DesignBackgroundPreset) -> some View {
+        modifier(DesignBackgroundModifier(preset: preset))
+    }
+}
+
+private struct DesignBackgroundModifier: ViewModifier {
+    @Environment(\.designSchemeColors) private var schemeColors
+    let preset: DesignBackgroundPreset
+
+    func body(content: Content) -> some View {
+        content.background(preset.makeStyle(using: schemeColors))
     }
 }
