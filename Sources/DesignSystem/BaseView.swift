@@ -311,21 +311,3 @@ public extension BaseView {
         )
     }
 }
-
-// MARK: - Optional sugar: apply presets anywhere
-
-public extension View {
-    /// Applies a DS-driven background preset to any view.
-    func designBackground(_ preset: DesignBackgroundPreset) -> some View {
-        modifier(DesignBackgroundModifier(preset: preset))
-    }
-}
-
-private struct DesignBackgroundModifier: ViewModifier {
-    @Environment(\.designSchemeColors) private var schemeColors
-    let preset: DesignBackgroundPreset
-
-    func body(content: Content) -> some View {
-        content.background(preset.makeStyle(using: schemeColors))
-    }
-}
