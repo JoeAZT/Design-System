@@ -82,7 +82,11 @@ public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
                 .padding(.horizontal, padding)
                 .frame(maxWidth: .infinity, alignment: position.frameAlignment)
             }
-            .background(resolvedBackground)
+            .background(
+                Rectangle()
+                    .fill(resolvedBackground)
+                    .ignoresSafeArea(.container, edges: .all)
+            )
             .foregroundStyle(schemeColors.primary.foreground)
             .navigationTitle(navigationTitle ?? "")
             .toolbar {
