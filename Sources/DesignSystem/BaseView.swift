@@ -22,6 +22,8 @@ import SwiftUI
 /// 2. Else if `backgroundPreset` is provided, it is built from the design scheme.
 /// 3. Else the default DS linear gradient is used.
 
+import SwiftUI
+
 public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
     // Background
     private let background: AnyShapeStyle?
@@ -40,14 +42,8 @@ public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
     @Environment(\.designSchemeColors) private var schemeColors
 
     private var defaultBackground: AnyShapeStyle {
-        AnyShapeStyle(
-            LinearGradient(
-                colors: Array(repeating: schemeColors.background.foreground, count: 6)
-                + [schemeColors.background.background],
-                startPoint: .bottomLeading,
-                endPoint: .topTrailing
-            )
-        )
+        // ✅ Unified with designDefaultBackground()
+        DesignBackgroundPreset.defaultStyle(using: schemeColors)
     }
 
     // MARK: Designated Initialiser (type-erased background)
@@ -73,7 +69,6 @@ public struct BaseView<Content: View, Leading: View, Trailing: View>: View {
     }
 
     public var body: some View {
-        // Resolve: explicit background > preset > DS default
         let resolvedBackground: AnyShapeStyle =
             background
             ?? backgroundPreset?.makeStyle(using: schemeColors)
@@ -168,33 +163,7 @@ public extension BaseView where Leading == EmptyView {
     }
 }
 
-public extension BaseView {
-    /// Argument-order variant
-    init(
-        navigationTitle: String? = nil,
-        @ViewBuilder leadingToolbar: () -> Leading,
-        @ViewBuilder trailingToolbar: () -> Trailing,
-        @ViewBuilder content: () -> Content,
-        position: ContentPosition = .topLeading,
-        background: AnyShapeStyle? = nil,
-        backgroundPreset: DesignBackgroundPreset? = nil,
-        padding: CGFloat = 16
-    ) {
-        self.init(
-            navigationTitle: navigationTitle,
-            position: position,
-            content: content,
-            leadingToolbar: leadingToolbar,
-            trailingToolbar: trailingToolbar,
-            background: background,
-            backgroundPreset: backgroundPreset,
-            padding: padding
-        )
-    }
-}
-
 // MARK: - Ultra-ergonomic overloads to pass any ShapeStyle directly
-// These let callers pass Color/Gradient/Material without wrapping in AnyShapeStyle.
 
 public extension BaseView {
     init<S: ShapeStyle>(

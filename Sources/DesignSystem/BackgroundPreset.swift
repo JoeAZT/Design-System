@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - Presets
+
 public enum DesignBackgroundPreset: Sendable {
     case extremeTopLeading
     case extremeTopTrailing
@@ -32,6 +34,18 @@ public enum DesignBackgroundPreset: Sendable {
                 center: center,
                 startRadius: 600,
                 endRadius: 900
+            )
+        )
+    }
+
+    /// Shared default design-system gradient used by BaseView and designDefaultBackground()
+    static func defaultStyle(using scheme: DesignSchemeColors) -> AnyShapeStyle {
+        AnyShapeStyle(
+            LinearGradient(
+                colors: Array(repeating: scheme.background.foreground, count: 6)
+                    + [scheme.background.background],
+                startPoint: .bottomLeading,
+                endPoint: .topTrailing
             )
         )
     }
@@ -72,7 +86,6 @@ private struct DesignBackgroundScreenFill: ViewModifier {
 
     func body(content: Content) -> some View {
         content.background(
-            // Using a view builder so we can attach ignoresSafeArea specifically to the background.
             Rectangle()
                 .fill(resolvedStyle)
                 .ignoresSafeArea(.container, edges: .all)
@@ -83,14 +96,7 @@ private struct DesignBackgroundScreenFill: ViewModifier {
         if let style { return style }
         if let preset { return preset.makeStyle(using: schemeColors) }
 
-        // Fallback to the same default as BaseView
-        return AnyShapeStyle(
-            LinearGradient(
-                colors: Array(repeating: schemeColors.background.foreground, count: 6)
-                        + [schemeColors.background.background],
-                startPoint: .bottomLeading,
-                endPoint: .topTrailing
-            )
-        )
+        // ✅ Use the same gradient BaseView uses by default
+        return DesignBackgroundPreset.defaultStyle(using: schemeColors)
     }
 }
